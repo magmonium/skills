@@ -542,6 +542,7 @@ jobs:
 | Widget child segment ≠ YAML nav child name | Nav shows wrong items or empty |
 | `title` in nav YAML is raw text, not i18n key | Untranslated label shown |
 | Editing compiled JSON directly | Overwritten by `assets:compile` — edit YAML only |
+| Adding `.gitignore` to `public/assets/` | Root `.gitignore` already ignores `apps/m-<name>/public/assets/` — no per-app gitignore needed |
 | Missing `NAV_WC_COMPONENTS` provider | Widget fails to render cross-bundle |
 | No `dependsOn` in project.json serve | Build fails — sass/one not ready |
 | Wrong selector in remote yml | WC doesn't mount in m-ui |
