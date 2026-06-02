@@ -155,37 +155,49 @@ export const appConfig: ApplicationConfig = provideMagWcConfig({
 
 ## 4. Providers (`providers.ts`)
 
-Minimum required tokens + nav widget registration:
+Nav widget registration + cross-bundle CE support:
 
 ```ts
 import { ApplicationConfig } from '@angular/core';
 import {
-  ASSET_BASE_URL, ONE_ASSET_BASE_URL,
-  NAV_DEFAULT_MURL,
   provideNavWidgets, settingsWidgets,
   NAV_WC_COMPONENTS,
+  provideUserTabs,
 } from '@magmonium/one';
 import { MySettingsComponent } from './widgets/my-settings/my-settings';
+import { MyUserNavComponent } from './widgets/user/ui/user-nav/user-nav';
 
 export const myProviders: ApplicationConfig['providers'] = [
-  { provide: ASSET_BASE_URL, useValue: '/assets' },
-  { provide: ONE_ASSET_BASE_URL, useValue: '/assets' },
-  { provide: NAV_DEFAULT_MURL, useValue: 'my-default-route' },  // route opened on nav toggle
+  ...provideUserTabs({ mykey: MyUserNavComponent }),  // if app has user nav tab
   ...provideNavWidgets({
     ...settingsWidgets(),                  // includes user/theme/language
+    root_myfeature: {
+      content: MySettingsComponent,
+      selector: 'mx-my-settings',         // REQUIRED: Angular selector = CE tag
+      breadcramb: { header: { icon: 'play', label: 'myfeature_i18n_key', id: 'root_myfeature' } },
+    },
     root_settings_myfeature: {
       content: MySettingsComponent,
+      selector: 'mx-my-settings',         // REQUIRED: Angular selector = CE tag
       breadcramb: { header: { icon: 'settings', label: 'myfeature_i18n_key', id: 'root_settings_myfeature' } },
     },
   }),
   {
     provide: NAV_WC_COMPONENTS,
-    useValue: [MySettingsComponent],       // REQUIRED for cross-bundle rendering
+    useValue: [MySettingsComponent],       // REQUIRED: registers as CE for cross-bundle rendering
   },
 ];
 ```
 
-**Widget ID convention:** `root_settings_<feature>` → nav path `settings/<feature>` → YAML `navs/settings.yml` must list `<feature>` in `navs`.
+**`ASSET_BASE_URL` / `ONE_ASSET_BASE_URL`** — do NOT add these to providers. The WC wrapper overrides `ASSET_BASE_URL` dynamically at runtime; `HttpService`/`ThemeStore` have `/assets` fallback. Adding them causes stale values in remote mode.
+
+**`NAV_DEFAULT_MURL`** — optional. If omitted, menu opens to the nav root (user clicks a specific item). If provided, menu toggle jumps directly to that nav path.
+
+**`selector` field in `NavWidgetConfig`** — must match the Angular `@Component` selector. `BaseRootWebComponent` registers these components as custom elements using `NAV_WC_COMPONENTS`; `resolvedWidget` uses `selector` as the CE tag. Without explicit `selector`, cross-bundle rendering fails.
+
+**Widget ID convention:**
+- `root_<feature>` → murl `/app/<appname>/<feature>` → embeddedId = `root_<feature>`
+- `root_settings_<feature>` → nav path `settings/<feature>` → YAML `navs/settings.yml` must list `<feature>` in `navs`
 
 ---
 
