@@ -536,7 +536,7 @@ jobs:
 
 | Mistake | Fix |
 |---------|-----|
-| No `<m-nav>` in `wc.ts` | Settings/widgets unreachable standalone — always add `<m-nav [showLogo]="false" />` |
+| `<m-nav />` in `wc.ts` | Duplicates nav in both standalone AND embedded — `FrameComponent`/host already renders it |
 | Missing `settings.yml` with `navs` | Settings sub-items don't appear in nav panel |
 | Widget child segment ≠ YAML nav child name | Nav shows wrong items or empty |
 | `title` in nav YAML is raw text, not i18n key | Untranslated label shown |
