@@ -377,12 +377,12 @@ export class MyUserNavComponent {
 
 | | Standalone (direct URL) | Embedded (m-ui host) |
 |---|---|---|
-| Nav | `<m-nav>` in `wc.ts` | Host renders `<m-nav [isHost]="true">` |
+| Nav | `FrameComponent` renders `<m-nav />` | Host `App` renders `<m-nav [isHost]="true">` |
 | Settings path | Fetches from app's `/assets/navs/` | Fetches from host's `/assets/navs/` |
 | `APP_BASE_HREF` | `/` | `/app/m-<name>` |
 | `assetStore.appId` | `undefined` | `m-<name>` |
 
-In standalone, omitting `<m-nav>` = no settings access. Always include it.
+Nav is always provided by the frame/host — never by `wc.ts`.
 
 ---
 
