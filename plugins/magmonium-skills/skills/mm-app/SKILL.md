@@ -554,7 +554,9 @@ jobs:
 | `title` in nav YAML is raw text, not i18n key | Untranslated label shown |
 | Editing compiled JSON directly | Overwritten by `assets:compile` — edit YAML only |
 | Adding `.gitignore` to `public/assets/` | Root `.gitignore` already ignores `apps/m-<name>/public/assets/` — no per-app gitignore needed |
-| Missing `NAV_WC_COMPONENTS` provider | Widget fails to render cross-bundle |
+| Missing `NAV_WC_COMPONENTS` provider | Widget fails to render cross-bundle — CE never registered |
+| Missing `selector` in `NavWidgetConfig` | Falls back to `reflectComponentType` which may not match registered CE tag — widget renders blank |
+| `ASSET_BASE_URL` / `ONE_ASSET_BASE_URL` in providers | WC wrapper overrides at runtime anyway; static value causes wrong asset URLs in remote mode — remove from providers |
 | No `dependsOn` in project.json serve | Build fails — sass/one not ready |
 | Wrong selector in remote yml | WC doesn't mount in m-ui |
 | LAN IP in `environment.ts` | Local serve hits `192.168.x.x:8000` not `localhost` — use `http://localhost:8000` |
