@@ -1,6 +1,6 @@
 ---
 name: mm-app
-description: Use when creating or configuring a new Magmonium WC app in the nx monorepo — bootstrapping, nav widgets, asset setup, module federation, standalone nav, providers pattern
+description: Use when creating or configuring a new Magmonium WC app in the nx monorepo — bootstrapping, nav widgets, asset setup, module federation, providers pattern
 ---
 
 # Magmonium App Creation & Configuration
