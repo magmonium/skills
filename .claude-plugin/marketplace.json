@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "magmonium-skills",
+  "description": "Magmonium NX Angular monorepo skills — app scaffolding, @magmonium/one UI components, i18n translate workflow",
+  "owner": {
+    "name": "Magmonium",
+    "url": "https://github.com/magmonium"
+  },
+  "plugins": [
+    {
+      "name": "magmonium-skills",
+      "description": "Skills for Magmonium NX: mm-app (app scaffolding), one-ui (@magmonium/one components), translate (i18n workflow)",
+      "source": "./plugins/magmonium-skills",
+      "category": "productivity"
+    }
+  ]
+}

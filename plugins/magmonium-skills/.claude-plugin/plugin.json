@@ -1,0 +1,10 @@
+{
+  "name": "magmonium-skills",
+  "version": "1.0.0",
+  "description": "Magmonium NX skills: mm-app, one-ui, translate",
+  "author": {
+    "name": "Magmonium",
+    "url": "https://github.com/magmonium"
+  },
+  "skills": "./skills/"
+}
