@@ -113,17 +113,16 @@ export const environment = {
 ```ts
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { BaseRootWebComponent, NavComponent } from '@magmonium/one';
+import { BaseRootWebComponent } from '@magmonium/one';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'mx-<name>-wc',          // prefix convention: first letter(s) of name
-  imports: [CommonModule, RouterOutlet, NavComponent],
+  imports: [CommonModule, RouterOutlet],
   template: `
     <main class="<name>-main">
       <router-outlet></router-outlet>
     </main>
-    <m-nav [showLogo]="false" />      // REQUIRED for standalone mode settings access
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -132,7 +131,7 @@ export class MyWebComponent extends BaseRootWebComponent implements OnInit {
 }
 ```
 
-**`<m-nav [showLogo]="false" />`** — mandatory. Without it, standalone mode has no nav, so settings/equalizer/organize widgets are unreachable. Embedded mode ignores it (host renders its own nav).
+**Never add `<m-nav />` here.** `FrameComponent` (used by `OneApp` in `bootstrapMagApp`) already renders `<m-nav />` in standalone mode. `m-ui` renders `<m-nav [isHost]="true" />` in embedded mode. Adding it to `wc.ts` duplicates the nav in **both** modes.
 
 ---
 
