@@ -677,3 +677,10 @@ jobs:
 | Wrong selector in remote yml | WC doesn't mount in m-ui |
 | LAN IP in `environment.ts` | Local serve hits `192.168.x.x:8000` not `localhost` — use `http://localhost:8000` |
 | `environment.dev.ts` pointing to LAN IP | CI/remote dev build hits wrong backend — should be `https://api-dev.magmonium.com` |
+| Missing `workbox-config.cjs` with `pwa:` set | `assets:wc` silently skips SW generation — app installs but won't cache |
+| Wrong `baseHref` in pwa build config | JS/CSS 404 after install — must match `/store/v1/wc/<appId>/pwa/` exactly |
+| Missing manifest link in `index.html` | Browser never sees manifest — install prompt never fires |
+| Missing `mag_assets/pwa/icon.svg` | `assets:wc` skips icon generation — PWA installs without icon |
+| `pwa:` as boolean (`pwa: true`) | Must be an object with `desc`/`color`/`bgcolor` — boolean breaks manifest generation |
+| Editing `public/assets/manifest.json` directly | Overwritten by `assets:wc` on every build — set colors in remote YAML `pwa:` block |
+| Testing PWA without running `assets:wc` first | `/local-dist/m-<name>-wc/pwa/` doesn't exist — proxy returns 404 |
