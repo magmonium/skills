@@ -288,6 +288,114 @@ After any YAML change: `npm run assets:compile`
 
 ---
 
+## 7b. PWA Configuration
+
+When `pwa:` is present in `mag_assets/remote/m-<name>.yml`, the full PWA pipeline activates during `npm run assets:wc`.
+
+### Required additions
+
+**`mag_assets/pwa/icon.svg`** — source icon, scaled to 192×512px by PwaCompiler:
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="96" fill="#121212"/>
+  <text x="256" y="320" font-family="system-ui,sans-serif" font-size="260" font-weight="700"
+        text-anchor="middle" fill="#ffffff">N</text>
+</svg>
+```
+Replace letter and colors to match the app. This is a placeholder — swap for real icon later.
+
+**`src/index.html`** — add manifest link + SW registration before `</head>`:
+```html
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#121212" />   <!-- match pwa.color -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+  }
+</script>
+```
+
+**`workbox-config.cjs`** — Workbox SW generation config (cache-first static, network-first API):
+```js
+module.exports = {
+  globDirectory: 'dist/apps/m-<name>-wc/pwa/',
+  globPatterns: ['**/*.{js,css,html,svg,ico,woff,woff2,png,jpg,webp}'],
+  swDest: 'dist/apps/m-<name>-wc/pwa/sw.js',
+  skipWaiting: true,
+  clientsClaim: true,
+  runtimeCaching: [
+    {
+      urlPattern: /^https:\/\/api.*magmonium\.com\/(?!store\/v1\/wc)/,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'm-<name>-api',
+        networkTimeoutSeconds: 10,
+        expiration: { maxEntries: 50, maxAgeSeconds: 300 },
+      },
+    },
+    {
+      urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'm-<name>-fonts',
+        expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+      },
+    },
+  ],
+};
+```
+
+**`project.json`** — add `pwa` build configuration under `build.configurations`:
+```json
+"pwa": {
+  "outputPath": "dist/apps/m-<name>-wc/pwa",
+  "baseHref": "/store/v1/wc/<appId>/pwa/",
+  "outputHashing": "all",
+  "assets": [
+    { "glob": "**/*", "input": "apps/m-<name>/public" },
+    { "glob": "**/*", "input": "apps/m-<name>/public/assets", "output": "assets" },
+    { "glob": "**/*", "input": "libs/one/assets", "output": "assets/one" },
+    { "glob": "manifest.json", "input": "apps/m-<name>/public/assets", "output": "." },
+    { "glob": "icons/**/*", "input": "apps/m-<name>/public/assets", "output": "." }
+  ]
+}
+```
+
+`<appId>` = the `app:` field value from the remote YAML (e.g. `radio`, `m-comics`).
+
+### How it builds
+
+`npm run assets:wc` detects `pwa:` in the remote YAML and automatically:
+1. Generates `manifest.json` → `apps/m-<name>/public/assets/`
+2. Runs `nx build m-<name> --configuration=pwa` → `dist/apps/m-<name>-wc/pwa/`
+3. Runs Workbox → `dist/apps/m-<name>-wc/pwa/sw.js`
+
+No separate command. No per-app `build-wc.ts`. The `mag-cli.config.js` drives everything.
+
+### Deployed path
+
+`dist/apps/m-<name>-wc/pwa/` uploads alongside `remote/` to:
+```
+api-dev.magmonium.com/store/v1/wc/<appId>/pwa/
+```
+
+### m-ui footer install button
+
+When active WC app's `app-wc.json` has a `pwa` field, the footer in m-ui shows an install icon. Clicking opens the PWA URL in a new tab where the browser shows the install prompt.
+
+### Local testing
+
+1. Run `npm run assets:wc` to build the PWA into `dist/apps/m-<name>-wc/pwa/`
+2. Start m-ui dev server (`npm start`)
+3. Navigate to the app section in m-ui
+4. Install button appears — clicking opens:
+   - `http://localhost:4200/local-dist/m-<name>-wc/pwa/` (served by the proxy)
+   - JS assets load via `/store/v1/wc/<appId>/pwa/` (also proxied to local dist)
+
+The `apps/m-ui/proxy.conf.js` handles both paths. No extra config needed.
+
+---
+
 ## 8. project.json (Key Parts)
 
 ```json
