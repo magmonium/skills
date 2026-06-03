@@ -685,6 +685,7 @@ jobs:
 | `environment.dev.ts` pointing to LAN IP | CI/remote dev build hits wrong backend — should be `https://api-dev.magmonium.com` |
 | Missing `workbox-config.cjs` with `pwa:` set | `assets:wc` silently skips SW generation — app installs but won't cache |
 | Wrong `baseHref` in pwa build config | JS/CSS 404 after install — must match `/store/v1/wc/<appId>/pwa/` exactly |
+| Missing `fileReplacements` in `pwa` build config | PWA bundles with `environment.ts` (localhost) → API calls hit `192.168.x.x:8000` in production — always add `fileReplacements` pointing to `environment.dev.ts` |
 | Missing manifest link in `index.html` | Browser never sees manifest — install prompt never fires |
 | Missing `mag_assets/pwa/icon.svg` | `assets:wc` skips icon generation — PWA installs without icon |
 | `pwa:` as boolean (`pwa: true`) | Must be an object with `desc`/`color`/`bgcolor` — boolean breaks manifest generation |
