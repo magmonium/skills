@@ -247,7 +247,7 @@ export default withModuleFederation(config, { dts: false });
 
 ## 7. YAML Assets (Required)
 
-**`mag_assets/remote/m-<name>.yml`** — WC manifest:
+**`mag_assets/remote/m-<name>.yml`** — WC manifest + optional PWA config:
 ```yaml
 app: m-<name>
 version: 0.0.1
@@ -257,7 +257,13 @@ componentName: wc
 className: MyWebComponent
 appConfigPath: apps/m-<name>/src/app/wc.config
 selector: mx-<name>-wc
+pwa:                                      # optional — enables PWA install button in m-ui footer
+  desc: Magmonium <Name> — short tagline
+  color: '#121212'                        # theme_color in manifest
+  bgcolor: '#121212'                      # background_color in manifest
 ```
+
+Presence of `pwa:` object = PWA enabled. `name` and `short_name` are auto-derived from the `app` field (`m-radio` → `M-Radio` / `Radio`). Omit `pwa:` entirely to disable.
 
 **`mag_assets/navs/root.yml`** — minimum:
 ```yaml
