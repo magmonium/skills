@@ -351,6 +351,12 @@ module.exports = {
   "outputPath": "dist/apps/m-<name>-wc/pwa",
   "baseHref": "/store/v1/wc/<appId>/pwa/",
   "outputHashing": "all",
+  "fileReplacements": [
+    {
+      "replace": "apps/m-<name>/src/environments/environment.ts",
+      "with": "apps/m-<name>/src/environments/environment.dev.ts"
+    }
+  ],
   "assets": [
     { "glob": "**/*", "input": "apps/m-<name>/public" },
     { "glob": "**/*", "input": "apps/m-<name>/public/assets", "output": "assets" },
