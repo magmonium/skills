@@ -30,9 +30,11 @@ apps/m-<name>/
   webpack.config.ts                # withModuleFederation
   project.json                     # Nx targets with dependsOn
   mag_assets/
-    remote/m-<name>.yml            # WC manifest (REQUIRED)
+    remote/m-<name>.yml            # WC manifest + optional PWA config (REQUIRED)
     navs/root.yml                  # App title (REQUIRED)
     navs/settings.yml              # If app has settings nav items
+    pwa/icon.svg                   # Source icon for PWA (if PWA enabled)
+  workbox-config.cjs               # Workbox SW config (if PWA enabled)
 ```
 
 ---
