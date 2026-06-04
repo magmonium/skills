@@ -222,6 +222,8 @@ export const wcRoutes: Route[] = [
 
 ## 6. Module Federation
 
+> **m-ui is NOT a webpack app.** `apps/m-ui` uses `@nx/angular:application` (esbuild executor) — no `customWebpackConfig`, no `ModuleFederationPlugin`. WC apps (`m-comics`, `m-finance`, etc.) still use `@nx/angular:webpack-browser` + `withModuleFederation`. Do not copy m-ui's `project.json` build executor when scaffolding a new WC app.
+
 **`module-federation.config.ts`:**
 ```ts
 import { ModuleFederationConfig } from '@nx/module-federation';
