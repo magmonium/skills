@@ -404,12 +404,31 @@ module.exports = {
 
 ### How it builds
 
-`npm run assets:wc` detects `pwa:` in the remote YAML and automatically:
-1. Generates `manifest.json` → `apps/m-<name>/public/assets/`
-2. Runs `nx build m-<name> --configuration=pwa` → `dist/apps/m-<name>-wc/pwa/`
-3. Runs Workbox → `dist/apps/m-<name>-wc/pwa/sw.js`
+The CLI's `assets-wc` command only copies YAML assets — it does NOT run the Angular build or Workbox. The full PWA pipeline runs via the per-app npm script in `package.json`:
 
-No separate command. No per-app `build-wc.ts`. The `mag-cli.config.js` drives everything.
+```json
+"assets:<name>": "nx run-many -t build -p cli,sass,one && node dist/libs/cli/bin/cli.js assets-wc --config ./mag-cli.config.js --app m-<name> && nx build m-<name> --configuration=pwa && node scripts/generate-sw.js && node scripts/patch-wc-env.js --app m-<name>"
+```
+
+Steps in order:
+1. `nx run-many -t build -p cli,sass,one` — builds libs (sass + one needed for Angular build)
+2. `assets-wc --app m-<name>` — generates `manifest.json`, icons → `public/assets/`; copies all YAML assets → `dist/apps/m-<name>-wc/`
+3. `nx build m-<name> --configuration=pwa` → Angular app → `dist/apps/m-<name>-wc/pwa/`
+4. `node scripts/generate-sw.js` — runs `workbox-build injectManifest` using `workbox-config.cjs` → writes `dist/apps/m-<name>-wc/pwa/sw.js` with precache manifest injected
+5. `node scripts/patch-wc-env.js --app m-<name>` — patches env-specific fields in `app-wc.json`
+
+**`scripts/generate-sw.js`** — shared script (already exists in repo root):
+```js
+#!/usr/bin/env node
+'use strict';
+const { injectManifest } = require('workbox-build');
+const config = require('../workbox-config.cjs');
+injectManifest(config)
+  .then(({ count, size }) => console.log(`SW generated: ${count} precache entries (${size} bytes)`))
+  .catch((err) => { console.error('SW generation failed:', err.message); process.exit(1); });
+```
+
+`workbox-build` is already a devDependency — no extra install needed.
 
 ### Deployed path
 
