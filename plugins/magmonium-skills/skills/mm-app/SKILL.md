@@ -680,6 +680,7 @@ jobs:
         env:
           NODE_OPTIONS: --dns-result-order=ipv4first
 
+      # Without PWA (no pwa: in remote YAML):
       - name: Build assets and web component
         run: |
           npx nx build cli
@@ -687,6 +688,17 @@ jobs:
           node scripts/patch-wc-env.js --app m-<name>
         env:
           BUILD_CONFIG: dev
+
+      # With PWA (pwa: present in remote YAML) — replace the step above:
+      # - name: Build libs, assets, PWA and web component
+      #   run: |
+      #     npx nx run-many -t build -p cli,sass,one
+      #     node dist/libs/cli/bin/cli.js assets-wc --config ./mag-cli.config.js --app m-<name>
+      #     npx nx build m-<name> --configuration=pwa
+      #     node scripts/generate-sw.js
+      #     node scripts/patch-wc-env.js --app m-<name>
+      #   env:
+      #     BUILD_CONFIG: dev
       - name: Package as bundle.zip
         if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
         run: cd dist/apps/m-<name>-wc && zip -r ../../../bundle.zip .
