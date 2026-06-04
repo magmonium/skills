@@ -251,7 +251,7 @@ export default withModuleFederation(config, { dts: false });
 
 **`mag_assets/remote/m-<name>.yml`** — WC manifest + optional PWA config:
 ```yaml
-app: m-<name>
+app: <slug>                               # short slug WITHOUT m- prefix (e.g. comics, finance, radio)
 version: 0.0.1
 company: Magmonium Media
 componentPath: apps/m-<name>/src/app
@@ -265,7 +265,9 @@ pwa:                                      # optional — enables PWA install but
   bgcolor: '#121212'                      # background_color in manifest
 ```
 
-Presence of `pwa:` object = PWA enabled. `name` and `short_name` are auto-derived from the `app` field (`m-radio` → `M-Radio` / `Radio`). Omit `pwa:` entirely to disable.
+**`app:` slug rule:** Use the short name WITHOUT the `m-` prefix — `comics`, `finance`, `wallet`, `radio`. This value becomes the path segment in `/store/v1/wc/<slug>/pwa/` on both the backend and the `baseHref`. The `mag_assets_env/{env}/remote/` override files must use the same short slug.
+
+Presence of `pwa:` object = PWA enabled. `name` and `short_name` are auto-derived from the `app` field (`radio` → `Radio` / `Radio`). Omit `pwa:` entirely to disable.
 
 **`mag_assets/navs/root.yml`** — minimum:
 ```yaml
