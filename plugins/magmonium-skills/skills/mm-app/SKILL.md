@@ -402,7 +402,7 @@ module.exports = {
 }
 ```
 
-`<appId>` = the `app:` field value from the remote YAML (e.g. `radio`, `m-comics`).
+`<slug>` = the `app:` field value from the remote YAML — short name WITHOUT `m-` prefix (e.g. `radio`, `comics`, `finance`, `wallet`).
 
 ### How it builds
 
