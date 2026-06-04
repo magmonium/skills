@@ -715,6 +715,8 @@ jobs:
 | Widget child segment ≠ YAML nav child name | Nav shows wrong items or empty |
 | `title` in nav YAML is raw text, not i18n key | Untranslated label shown |
 | Editing compiled JSON directly | Overwritten by `assets:compile` — edit YAML only |
+| Running `assets:wc` without `--app` for a single app | Compiles ALL 6 app asset paths — use `assets:<appname>` scripts instead; `assets-wc --app <name>` filters to libs/one + target only |
+| Copying m-ui `project.json` executor for new WC app | m-ui uses esbuild (`@nx/angular:application`); WC apps need `@nx/angular:webpack-browser` + `customWebpackConfig` |
 | Adding `.gitignore` to `public/assets/` | Root `.gitignore` already ignores `apps/m-<name>/public/assets/` — no per-app gitignore needed |
 | Missing `NAV_WC_COMPONENTS` provider | Widget fails to render cross-bundle — CE never registered |
 | Missing `selector` in `NavWidgetConfig` | Falls back to `reflectComponentType` which may not match registered CE tag — widget renders blank |
