@@ -436,8 +436,10 @@ injectManifest(config)
 
 `dist/apps/m-<name>-wc/pwa/` uploads alongside `remote/` to:
 ```
-api-dev.magmonium.com/store/v1/wc/<appId>/pwa/
+api-dev.magmonium.com/store/v1/wc/<slug>/pwa/
 ```
+
+where `<slug>` = the `app:` field value (e.g. `comics`, `radio`, `finance`, `wallet`).
 
 ### m-ui footer install button
 
@@ -450,7 +452,7 @@ When active WC app's `app-wc.json` has a `pwa` field, the footer in m-ui shows a
 3. Navigate to the app section in m-ui
 4. Install button appears — clicking opens:
    - `http://localhost:4200/local-dist/m-<name>-wc/pwa/` (served by proxy → `dist/apps/m-<name>-wc/pwa/index.html`)
-   - JS/CSS assets load via `/store/v1/wc/<appId>/pwa/` (proxy maps `appId` → `dist/apps/m-<appId>-wc/pwa/`)
+   - JS/CSS assets load via `/store/v1/wc/<slug>/pwa/` (proxy prepends `m-` to slug → `dist/apps/m-<name>-wc/pwa/`)
 
 The `apps/m-ui/proxy.conf.js` handles both paths. No extra config needed.
 
