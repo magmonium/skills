@@ -778,11 +778,15 @@ jobs:
 | Wrong selector in remote yml | WC doesn't mount in m-ui |
 | LAN IP in `environment.ts` | Local serve hits `192.168.x.x:8000` not `localhost` — use `http://localhost:8000` |
 | `environment.dev.ts` pointing to LAN IP | CI/remote dev build hits wrong backend — should be `https://api-dev.magmonium.com` |
-| Missing `workbox-config.cjs` with `pwa:` set | `assets:wc` silently skips SW generation — app installs but won't cache |
-| Wrong `baseHref` in pwa build config | JS/CSS 404 after install — must match `/store/v1/wc/<appId>/pwa/` exactly |
+| Missing `workbox-config.cjs` with `pwa:` set | SW never generated — app installs but loads uncached on every visit |
+| Using `generateSW` mode in `workbox-config.cjs` | Overwrites `public/sw.js` entirely — any custom fetch logic (CORS proxy etc.) is lost. Use `injectManifest` with `swSrc` |
+| `self.__WB_MANIFEST` appears more than once in `public/sw.js` | `workbox-build injectManifest` requires exactly one occurrence — check comments too |
+| Wrong `baseHref` in pwa build config | JS/CSS 404 after install — proxy maps `appId` segment directly to `dist/apps/<appId>-wc/`; use full name e.g. `/store/v1/wc/m-comics/pwa/` |
 | Missing `fileReplacements` in `pwa` build config | PWA bundles with `environment.ts` (localhost) → API calls hit `192.168.x.x:8000` in production — always add `fileReplacements` pointing to `environment.dev.ts` |
+| CI build step missing lib builds for PWA | Angular build needs `sass` + `one` compiled first — add `npx nx run-many -t build -p cli,sass,one` before `nx build m-<name> --configuration=pwa` |
+| Missing `node scripts/generate-sw.js` in CI | Angular pwa build produces no `sw.js` precache — workbox step must run after `nx build` |
 | Missing manifest link in `index.html` | Browser never sees manifest — install prompt never fires |
-| Missing `mag_assets/pwa/icon.svg` | `assets:wc` skips icon generation — PWA installs without icon |
+| Missing `mag_assets/pwa/icon.svg` | `assets-wc` skips icon generation — PWA installs without icon |
 | `pwa:` as boolean (`pwa: true`) | Must be an object with `desc`/`color`/`bgcolor` — boolean breaks manifest generation |
-| Editing `public/assets/manifest.json` directly | Overwritten by `assets:wc` on every build — set colors in remote YAML `pwa:` block |
-| Testing PWA without running `assets:wc` first | `/local-dist/m-<name>-wc/pwa/` doesn't exist — proxy returns 404 |
+| Editing `public/assets/manifest.json` directly | Overwritten by `assets:<name>` on every build — set colors in remote YAML `pwa:` block |
+| Testing PWA without running `assets:<name>` first | `/local-dist/m-<name>-wc/pwa/` doesn't exist — proxy returns 404 |
