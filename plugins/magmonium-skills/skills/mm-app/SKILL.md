@@ -783,7 +783,7 @@ jobs:
 | Missing `workbox-config.cjs` with `pwa:` set | SW never generated — app installs but loads uncached on every visit |
 | Using `generateSW` mode in `workbox-config.cjs` | Overwrites `public/sw.js` entirely — any custom fetch logic (CORS proxy etc.) is lost. Use `injectManifest` with `swSrc` |
 | `self.__WB_MANIFEST` appears more than once in `public/sw.js` | `workbox-build injectManifest` requires exactly one occurrence — check comments too |
-| Wrong `baseHref` in pwa build config | JS/CSS 404 after install — proxy maps `appId` segment directly to `dist/apps/<appId>-wc/`; use full name e.g. `/store/v1/wc/m-comics/pwa/` |
+| Wrong `baseHref` in pwa build config | 409 on all assets — `baseHref` must use short slug WITHOUT `m-` prefix e.g. `/store/v1/wc/comics/pwa/`; proxy prepends `m-` to resolve `dist/apps/m-comics-wc/pwa/` locally; backend slug must match too |
 | Missing `fileReplacements` in `pwa` build config | PWA bundles with `environment.ts` (localhost) → API calls hit `192.168.x.x:8000` in production — always add `fileReplacements` pointing to `environment.dev.ts` |
 | CI build step missing lib builds for PWA | Angular build needs `sass` + `one` compiled first — add `npx nx run-many -t build -p cli,sass,one` before `nx build m-<name> --configuration=pwa` |
 | Missing `node scripts/generate-sw.js` in CI | Angular pwa build produces no `sw.js` precache — workbox step must run after `nx build` |
