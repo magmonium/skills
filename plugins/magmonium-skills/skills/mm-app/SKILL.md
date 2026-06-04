@@ -443,14 +443,16 @@ When active WC app's `app-wc.json` has a `pwa` field, the footer in m-ui shows a
 
 ### Local testing
 
-1. Run `npm run assets:wc` to build the PWA into `dist/apps/m-<name>-wc/pwa/`
+1. Run `npm run assets:<name>` to build everything into `dist/apps/m-<name>-wc/pwa/`
 2. Start m-ui dev server (`npm start`)
 3. Navigate to the app section in m-ui
 4. Install button appears — clicking opens:
-   - `http://localhost:4200/local-dist/m-<name>-wc/pwa/` (served by the proxy)
-   - JS assets load via `/store/v1/wc/<appId>/pwa/` (also proxied to local dist)
+   - `http://localhost:4200/local-dist/m-<name>-wc/pwa/` (served by proxy → `dist/apps/m-<name>-wc/pwa/index.html`)
+   - JS/CSS assets load via `/store/v1/wc/<appId>/pwa/` (proxy maps `appId` → `dist/apps/m-<appId>-wc/pwa/`)
 
 The `apps/m-ui/proxy.conf.js` handles both paths. No extra config needed.
+
+> **`<appId>` proxy mapping:** The proxy strips `m-` prefix from `/store/v1/wc/<appId>/pwa/` and appends `-wc` to get the dist dir. So `baseHref: "/store/v1/wc/m-comics/pwa/"` maps to `dist/apps/m-comics-wc/pwa/` — correct. If `baseHref` used `comics` (no `m-` prefix), it would map to `dist/apps/comics-wc/` — wrong. Always match `baseHref` `appId` segment to the full app name including `m-`.
 
 ---
 
