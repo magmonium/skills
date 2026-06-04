@@ -328,33 +328,53 @@ Replace letter and colors to match the app. This is a placeholder — swap for r
 </script>
 ```
 
-**`workbox-config.cjs`** — Workbox SW generation config (cache-first static, network-first API):
+**`public/sw.js`** — service worker source. The `self.__WB_MANIFEST` placeholder is replaced by `scripts/generate-sw.js` at build time with the precache manifest. In dev builds it is undefined and precaching is a no-op. Add any custom fetch logic (e.g. CORS proxy) here — it survives the workbox injection:
+```js
+// Replaced by workbox-build injectManifest with [{url, revision}, ...] entries.
+// undefined in dev builds — precaching is a no-op.
+const PRECACHE = self.__WB_MANIFEST;
+const CACHE_NAME = 'm-<name>-precache-v1';
+
+self.addEventListener('install', (event) => {
+  if (PRECACHE?.length) {
+    event.waitUntil(
+      caches.open(CACHE_NAME).then((cache) =>
+        Promise.allSettled(PRECACHE.map((entry) =>
+          cache.add(new Request(entry.url, { cache: 'reload' }))
+        ))
+      )
+    );
+  }
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  const cleanup = PRECACHE?.length
+    ? caches.keys()
+        .then((keys) => Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))))
+        .then(() => self.clients.claim())
+    : self.clients.claim();
+  event.waitUntil(cleanup);
+});
+
+self.addEventListener('fetch', (event) => {
+  // Serve from precache for same-origin requests
+  if (PRECACHE?.length && event.request.url.startsWith(self.location.origin)) {
+    event.respondWith(
+      caches.match(event.request).then((cached) => cached || fetch(event.request))
+    );
+  }
+});
+```
+
+**`workbox-config.cjs`** — uses `injectManifest` mode so custom SW logic in `public/sw.js` is preserved. `generateSW` would overwrite the file entirely:
 ```js
 module.exports = {
+  swSrc: 'apps/m-<name>/public/sw.js',
+  swDest: 'dist/apps/m-<name>-wc/pwa/sw.js',
   globDirectory: 'dist/apps/m-<name>-wc/pwa/',
   globPatterns: ['**/*.{js,css,html,svg,ico,woff,woff2,png,jpg,webp}'],
-  swDest: 'dist/apps/m-<name>-wc/pwa/sw.js',
-  skipWaiting: true,
-  clientsClaim: true,
-  runtimeCaching: [
-    {
-      urlPattern: /^https:\/\/api.*magmonium\.com\/(?!store\/v1\/wc)/,
-      handler: 'NetworkFirst',
-      options: {
-        cacheName: 'm-<name>-api',
-        networkTimeoutSeconds: 10,
-        expiration: { maxEntries: 50, maxAgeSeconds: 300 },
-      },
-    },
-    {
-      urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com/,
-      handler: 'CacheFirst',
-      options: {
-        cacheName: 'm-<name>-fonts',
-        expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
-      },
-    },
-  ],
+  globIgnores: ['sw.js', 'sw.js.map'],
 };
 ```
 
