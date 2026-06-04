@@ -602,14 +602,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: 'yarn'
+          registry-url: https://npm.pkg.github.com/
+          scope: '@magmonium'
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.MAGMONIUM_SEC}}
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: node-modules-cache
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-modules-
+
+      - name: Cache Nx
+        uses: actions/cache@v4
+        with:
+          path: |
+            .nx/cache
+            .nx/workspace-data
+          key: ${{ runner.os }}-nx-wc-${{ hashFiles('**/yarn.lock') }}-${{ hashFiles('libs/cli/**', 'nx.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nx-wc-${{ hashFiles('**/yarn.lock') }}-
+            ${{ runner.os }}-nx-wc-
+
       - name: Install dependencies
+        if: steps.node-modules-cache.outputs.cache-hit != 'true'
         run: yarn install --frozen-lockfile --network-timeout 300000
         env:
           NODE_OPTIONS: --dns-result-order=ipv4first
+
       - name: Build assets and web component
         run: |
           npx nx build cli
