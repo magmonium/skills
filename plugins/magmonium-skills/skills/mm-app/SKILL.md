@@ -384,7 +384,7 @@ module.exports = {
 ```json
 "pwa": {
   "outputPath": "dist/apps/m-<name>-wc/pwa",
-  "baseHref": "/store/v1/wc/<appId>/pwa/",
+  "baseHref": "/store/v1/wc/<slug>/pwa/",
   "outputHashing": "all",
   "fileReplacements": [
     {
