@@ -454,7 +454,7 @@ When active WC app's `app-wc.json` has a `pwa` field, the footer in m-ui shows a
 
 The `apps/m-ui/proxy.conf.js` handles both paths. No extra config needed.
 
-> **`<appId>` proxy mapping:** The proxy strips `m-` prefix from `/store/v1/wc/<appId>/pwa/` and appends `-wc` to get the dist dir. So `baseHref: "/store/v1/wc/m-comics/pwa/"` maps to `dist/apps/m-comics-wc/pwa/` — correct. If `baseHref` used `comics` (no `m-` prefix), it would map to `dist/apps/comics-wc/` — wrong. Always match `baseHref` `appId` segment to the full app name including `m-`.
+> **Proxy slug mapping:** `proxy.conf.js` maps `/store/v1/wc/<slug>/pwa/` → `dist/apps/m-<slug>-wc/pwa/` (it prepends `m-`). So `baseHref: "/store/v1/wc/comics/pwa/"` correctly resolves to `dist/apps/m-comics-wc/pwa/` locally. Always use the short slug WITHOUT `m-` in `baseHref` — matches both the backend URL and the local proxy.
 
 ---
 
