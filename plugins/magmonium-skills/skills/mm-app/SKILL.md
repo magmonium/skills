@@ -284,7 +284,18 @@ title: myfeature_i18n_key
 icon: settings
 ```
 
-After any YAML change: `npm run assets:compile`
+After any YAML change — choose the targeted script (faster):
+
+| Changed assets in… | Run |
+|---|---|
+| `libs/one/mag_assets` or `apps/m-ui/mag_assets` | `npm run assets:ui` |
+| `apps/m-comics/mag_assets` | `npm run assets:comics` |
+| `apps/m-finance/mag_assets` | `npm run assets:finance` |
+| `apps/m-radio/mag_assets` | `npm run assets:radio` |
+| `apps/m-wallet/mag_assets` | `npm run assets:wallet` |
+| Everything (all apps) | `npm run assets:compile` |
+
+`assets:<appname>` compiles only `libs/one` + target app assets (WC apps also run WC bundle + PWA). `assets:ui` compiles one + m-ui only, skips WC/PWA. `assets:compile` compiles all paths.
 
 ---
 
