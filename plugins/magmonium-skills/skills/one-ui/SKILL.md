@@ -20,6 +20,9 @@ description: Build Angular UI components using @magmonium/one library components
    - Asset lives in `libs/one/mag_assets/` → add `one` prop: `<m-button name="btn" one />`
    - Asset lives in app's own `mag_assets/` (e.g. `apps/m-radio/mag_assets/`) → no `one` prop: `<m-button name="btn" />`
    - Wrong location = asset not found at runtime. Always decide location before creating the YAML.
+7. **Never add external classes to `m-` components** — ESLint rule `local/no-external-classes-on-m-components` blocks this at commit time.
+   - Wrong: `<m-img class="my-class" ... />`
+   - Fix: wrap in a `<div class="my-class">` and style the wrapper instead.
 
 ---
 
