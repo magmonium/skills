@@ -5,6 +5,74 @@ description: Build Angular UI components using @magmonium/one library components
 
 # one-ui: Build UI with @magmonium/one
 
+## Theme System (single source of truth)
+
+**ThemeStore is the only authority for all colors.** When theme changes, ThemeStore writes CSS custom properties directly to `document.documentElement.style`. SASS vars are pure aliases — no hardcoded values anywhere.
+
+### CSS custom property naming
+
+All theme color keys from `mag_assets/theme/*.ts` are written as `--m-{kebab-case}`:
+
+| Theme key | CSS var | SASS alias |
+|---|---|---|
+| `mm` | `--m-mm` | `m.$mm` |
+| `background` | `--m-background` | `m.$background` |
+| `textSecondary` | `--m-text-secondary` | `m.$text-secondary` |
+| `backdropStandard` | `--m-backdrop-standard` | `m.$backdrop-standard` |
+| `toolTipBg` | `--m-tool-tip-bg` | `m.$tooltip-bg` |
+| `errorLight` | `--m-error-light` | `m.$error-light` |
+
+### Two-tier color priority (component > global)
+
+Components expose their own CSS vars that consumers can override. Global theme vars are the fallback:
+
+```sass
+// Component SASS sets local var, falls back to global theme var
+--m-btn-color: var(--m-button-color, #{m.$mm})
+//              ↑ consumer override    ↑ ThemeStore-managed global
+```
+
+To color a component instance, set the component var on the host:
+```html
+<!-- Host CSS: m-button { --m-button-color: var(--m-error); } -->
+<m-button name="delete_btn" />
+```
+
+### SASS rules for colors
+
+- **Always use `m.$var`** — never hardcode hex values or `var(--old-name, #fallback)`.
+- **No `@media (prefers-color-scheme: dark)` blocks** — ThemeStore controls dark/light. OS media queries fight ThemeStore and break user-selected themes.
+- **No `-dark` SASS variants** (`m.$background-dark` is gone). When dark theme is selected, ThemeStore sets `--m-background` to the dark value. `m.$background` reacts automatically.
+
+```sass
+// ✅ Correct
+.my-block
+  background: m.$background
+  color: m.$text
+  border-color: m.$border
+
+// ❌ Wrong — hardcoded, won't react to theme changes
+.my-block
+  background: #ffffff
+  color: #334955
+
+// ❌ Wrong — OS media query fights ThemeStore
+.my-block
+  background: m.$background
+  @media (prefers-color-scheme: dark)
+    background: m.$background-dark  // m.$background-dark no longer exists
+```
+
+### Adding a new theme color
+
+1. Add the key to all theme files in `mag_assets/theme/*.ts`
+2. Run `npm run assets:compile` — generates updated JSON only (no CSS files)
+3. ThemeStore reads JSON, writes `--m-{key}` to `:root` at runtime
+4. Add SASS alias to `libs/sass/src/lib/variables/_colors.sass`: `$my-color: var(--m-my-color)`
+5. Use in SASS: `m.$my-color`
+
+---
+
 ## Rules (non-negotiable)
 
 1. **Never use native HTML** where a `@magmonium/one` component exists:
