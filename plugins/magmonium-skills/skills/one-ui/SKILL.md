@@ -120,10 +120,30 @@ To color a component instance, set the component var on the host:
 ```html
 <m-button-group name="filter_tabs" [buttons]="overrides()" (clicked)="onTab($event)" />
 ```
+- **No content projection** — template has no `ng-content`. Never nest `<m-button>` children inside; group is fully asset-driven via `name` (loads `mag_assets/button_groups/<name>.yml`'s `buttons: [<button-asset-names>]`) and emits ONE `(clicked)` for whichever button fired.
 - `name` → `mag_assets/button_groups/<name>.yml`
-- `[buttons]` → `Record<string, Partial<Button>>` for runtime overrides (badge counts, primary state)
-- `(clicked)` → emits `Button | undefined`
+- `[buttons]` → `Record<string, Partial<Button>>` for runtime overrides (e.g. per-row `disabled`, badge counts, primary state) — keyed by button asset name
+- `(clicked)` → emits `Button | undefined`; branch on `button?.name` to dispatch the right handler
 - `remote` → app ID; propagates to all child `m-button` and `m-context-menu`
+
+```html
+<!-- Per-row dynamic state (e.g. list of items each with own processing flag) -->
+<m-button-group
+  name="notification_actions"
+  [buttons]="actionOverrides(item.id)"
+  (clicked)="onAction($event, item.id)"
+/>
+```
+```ts
+actionOverrides = (id: string): Record<string, Partial<Button>> => ({
+  approve_notification: { disabled: this.isProcessing(id) },
+  reject_notification: { disabled: this.isProcessing(id) },
+});
+onAction = (button: Button | undefined, id: string): void => {
+  if (button?.name === 'approve_notification') this.approve(id);
+  else if (button?.name === 'reject_notification') this.reject(id);
+};
+```
 
 ### `m-header` / `HeaderComponent`
 ```html
