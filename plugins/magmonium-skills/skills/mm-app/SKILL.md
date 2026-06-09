@@ -321,8 +321,15 @@ When `pwa:` is present in `mag_assets/remote/m-<name>.yml`, the full PWA pipelin
 ```
 Replace letter and colors to match the app. This is a placeholder — swap for real icon later.
 
-**`src/index.html`** — add manifest link + SW registration before `</head>`:
+**`src/index.html`** — replace hardcoded `favicon.ico`/`favicon.svg` with compiled logo assets (all apps, not just PWA). For PWA apps also add manifest link + SW registration:
 ```html
+<!-- All apps — replaces any hardcoded favicon.ico / favicon.svg -->
+<link rel="icon" type="image/svg+xml" href="assets/logo/icon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="assets/logo/32x32.png" />
+<link rel="icon" href="assets/logo/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="assets/logo/180x180.png" />
+
+<!-- PWA apps only — add below the favicon links -->
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#121212" />   <!-- match pwa.color -->
 <script>
@@ -331,6 +338,8 @@ Replace letter and colors to match the app. This is a placeholder — swap for r
   }
 </script>
 ```
+
+Delete stale `public/favicon.ico` and `public/favicon.svg` after updating `index.html`.
 
 **`public/sw.js`** — service worker source. The `self.__WB_MANIFEST` placeholder is replaced by `scripts/generate-sw.js` at build time with the precache manifest. In dev builds it is undefined and precaching is a no-op. Add any custom fetch logic (e.g. CORS proxy) here — it survives the workbox injection:
 ```js
