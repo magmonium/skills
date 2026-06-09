@@ -311,7 +311,8 @@ When `pwa:` is present in `mag_assets/remote/m-<name>.yml`, the full PWA pipelin
 
 ### Required additions
 
-**`mag_assets/pwa/icon.svg`** — source icon, scaled to 192×512px by PwaCompiler:
+**`mag_assets/logo/source.svg`** — source icon for LogoCompiler (all apps), must have square `viewBox`. LogoCompiler outputs `public/assets/logo/`: `192x192.png`, `512x512.png`, `180x180.png`, `32x32.png`, `icon.svg`, `favicon.ico`. Missing file → skipped gracefully.
+
 ```svg
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <rect width="512" height="512" rx="96" fill="#121212"/>
@@ -319,7 +320,9 @@ When `pwa:` is present in `mag_assets/remote/m-<name>.yml`, the full PWA pipelin
         text-anchor="middle" fill="#ffffff">N</text>
 </svg>
 ```
-Replace letter and colors to match the app. This is a placeholder — swap for real icon later.
+Replace letter and colors to match the app. Placeholder — swap for real icon later.
+
+**`mag_assets/pwa/icon.svg`** — still required by PwaCompiler for PWA-enabled apps. Can be the same SVG content as `logo/source.svg`.
 
 **`src/index.html`** — replace hardcoded `favicon.ico`/`favicon.svg` with compiled logo assets (all apps, not just PWA). For PWA apps also add manifest link + SW registration:
 ```html
