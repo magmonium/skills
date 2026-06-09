@@ -33,7 +33,8 @@ apps/m-<name>/
     remote/m-<name>.yml            # WC manifest + optional PWA config (REQUIRED)
     navs/root.yml                  # App title (REQUIRED)
     navs/settings.yml              # If app has settings nav items
-    pwa/icon.svg                   # Source icon for PWA (if PWA enabled)
+    logo/source.svg                # Source SVG for LogoCompiler (square viewBox required)
+    pwa/icon.svg                   # Source icon for PwaCompiler (if PWA enabled)
   workbox-config.cjs               # Workbox SW config (if PWA enabled)
 ```
 
