@@ -260,6 +260,7 @@ componentName: wc
 className: MyWebComponent
 appConfigPath: apps/m-<name>/src/app/wc.config
 selector: mx-<name>-wc
+logo: assets/logo/192x192.png             # optional — resolved to absolute URL by NavStore, shown as app card icon
 pwa:                                      # optional — enables PWA install button in m-ui footer
   desc: Magmonium <Name> — short tagline
   color: '#121212'                        # theme_color in manifest
