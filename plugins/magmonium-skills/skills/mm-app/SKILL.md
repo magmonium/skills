@@ -804,6 +804,10 @@ jobs:
 | CI build step missing lib builds for PWA | Angular build needs `sass` + `one` compiled first — add `npx nx run-many -t build -p cli,sass,one` before `nx build m-<name> --configuration=pwa` |
 | Missing `node scripts/generate-sw.js` in CI | Angular pwa build produces no `sw.js` precache — workbox step must run after `nx build` |
 | Missing manifest link in `index.html` | Browser never sees manifest — install prompt never fires |
+| Missing `mag_assets/logo/source.svg` | LogoCompiler skips app silently — favicons 404, app card shows no logo |
+| `viewBox` not square in `logo/source.svg` | PNGs distorted at small sizes — always use square `viewBox` (e.g. `0 0 512 512`) |
+| Old `public/favicon.ico` / `public/favicon.svg` left in place | Browser uses stale favicon, not compiled logo assets — delete both after updating `index.html` |
+| `logo` field missing from `mag_assets/remote/m-<name>.yml` | App card in m-ui shows no logo image — add `logo: assets/logo/192x192.png` |
 | Missing `mag_assets/pwa/icon.svg` | `assets-wc` skips icon generation — PWA installs without icon |
 | `pwa:` as boolean (`pwa: true`) | Must be an object with `desc`/`color`/`bgcolor` — boolean breaks manifest generation |
 | Editing `public/assets/manifest.json` directly | Overwritten by `assets:<name>` on every build — set colors in remote YAML `pwa:` block |
