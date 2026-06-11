@@ -56,11 +56,14 @@ for plugin in workflow-skills magmonium-skills; do
 done
 
 git add -A
-if git diff --cached --quiet; then
-  echo "skills in sync, nothing to push"
-  exit 0
+if ! git diff --cached --quiet; then
+  git commit -m "chore: sync skills${bumped[*]:+ ${bumped[*]}}"
 fi
 
-git commit -m "chore: sync skills${bumped[*]:+ ${bumped[*]}}"
-git push
-echo "pushed: ${bumped[*]:-manifest-only change}"
+# push anything unpushed — covers commits whose push failed earlier
+if [ -n "$(git log --oneline @{u}..HEAD 2>/dev/null)" ]; then
+  git push
+  echo "pushed: ${bumped[*]:-pending commits}"
+else
+  echo "skills in sync, nothing to push"
+fi
