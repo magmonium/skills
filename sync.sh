@@ -16,7 +16,11 @@ sync_plugin() {
   local dest="$REPO_DIR/plugins/$plugin/skills"
   for s in "${skills[@]}"; do
     if [ -d "$SRC/$s" ]; then
-      rsync -aL --delete "$SRC/$s/" "$dest/$s/"
+      # symlinked skills pointing into ~/Documents are TCC-blocked under
+      # launchd — skip there, manual terminal runs still sync them
+      if ! rsync -aL --delete "$SRC/$s/" "$dest/$s/" 2>/dev/null; then
+        echo "skip $s (source unreadable — run ./sync.sh from terminal to sync it)"
+      fi
     fi
   done
 }
@@ -57,6 +61,6 @@ if git diff --cached --quiet; then
   exit 0
 fi
 
-git commit -m "chore: sync skills ${bumped[*]:-}"
+git commit -m "chore: sync skills${bumped[*]:+ ${bumped[*]}}"
 git push
 echo "pushed: ${bumped[*]:-manifest-only change}"
