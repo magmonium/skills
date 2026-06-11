@@ -63,5 +63,3 @@ Task files follow `to-tasks` format ([TASK-FORMAT](../to-tasks/TASK-FORMAT.md)) 
 - Findings: accepted / rejected counts, one line each accepted.
 - New task files (paths only). PRD moved or stays.
 - NO commit — user commits. No prose padding. Security details exempt from caveman.
-
-<!-- sync-test: remove me -->
