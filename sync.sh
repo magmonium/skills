@@ -16,7 +16,7 @@ sync_plugin() {
   local dest="$REPO_DIR/plugins/$plugin/skills"
   for s in "${skills[@]}"; do
     if [ -d "$SRC/$s" ]; then
-      rsync -a --delete "$SRC/$s/" "$dest/$s/"
+      rsync -aL --delete "$SRC/$s/" "$dest/$s/"
     fi
   done
 }
