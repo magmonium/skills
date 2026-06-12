@@ -1,13 +1,20 @@
 ---
 name: translate
-description: Use when asked to /translate — scans Angular templates for | translate pipe usages, finds missing i18n keys, and creates the appropriate YAML asset files in the correct mag_assets/i18n/ folder based on where the component lives.
+description: Use when asked to /translate — scans Angular templates for raw (untranslated) text and | translate pipe usages with missing i18n keys, wraps raw text with the translate pipe, creates en-only YAML files in the correct mag_assets/i18n/ folder, runs the fix-i18n CLI to machine-translate remaining languages, then verifies nothing breaks and lint passes.
 ---
 
 # translate
 
 ## Overview
 
-Scans Angular component templates for `| translate` pipe usages, identifies keys missing from compiled i18n JSON, and creates missing YAML files in the correct scope's `mag_assets/i18n/` folder with **proper translations** for all required languages.
+Full i18n pipeline for the nx repo:
+
+1. **Discover** — find (a) `| translate` keys missing from `mag_assets/i18n/`, and (b) raw hardcoded text in templates that has no `| translate` pipe at all.
+2. **Fix templates** — wrap raw text with `| translate` + new snake_case key.
+3. **Create YAML** — for each missing key, write file with **only the `en:` translation. Nothing else.**
+4. **Run CLI** — `npm run translate:fix` machine-translates all remaining languages.
+5. **Rectify** — review CLI output, fix bad/missed translations.
+6. **Verify** — `npm run assets:compile` + lint for touched scope. All green → complete.
 
 ## Scope Rules
 
@@ -25,9 +32,32 @@ YAML path: `<scope_root>/mag_assets/i18n/<first_char_of_key>/<key>.yml`
 ### Step 1 — Resolve scope
 
 If a file path argument is given, scope = the app/lib that file belongs to.
-If no argument, scan all `.ts` files across the entire repo.
+If no argument, scan all component templates across the entire repo.
 
-### Step 2 — Extract translate keys
+### Step 2 — Discover raw (untranslated) text
+
+Scan templates (inline + `.html`) for user-visible static text NOT passing through `| translate`:
+
+- Element text nodes: `<span>Net Margin</span>`
+- User-facing attributes: `placeholder`, `title`, `label`, `aria-label`, `alt`, `tooltip`
+
+Skip: `.spec.ts` files, interpolated variables, numbers/punctuation-only, single chars, icon names, `class`/`id`/routerLink/technical attrs.
+
+For each finding, wrap with translate pipe — key = snake_case of the text:
+
+```html
+<!-- before -->
+<span>Net Margin</span>
+<input placeholder="Search stocks" />
+
+<!-- after -->
+<span>{{ 'net_margin' | translate }}</span>
+<input [placeholder]="'search_stocks' | translate" />
+```
+
+The original text becomes the `en:` value of the new key (exact text preserved, not re-humanized). Add these keys to the missing-key list.
+
+### Step 3 — Extract existing translate keys
 
 Grep for `| translate` in templates. Handle three patterns:
 
@@ -55,9 +85,9 @@ return { label: 'bullish_support' }   →  key = bullish_support
 **Untraceable** (data from API, e.g. `item.label | translate`):
 → Report as `DYNAMIC/UNTRACEABLE`, skip YAML creation.
 
-### Step 3 — Check existing keys
+### Step 4 — Check existing keys
 
-For each key:
+For each key (from Steps 2 + 3):
 1. **Check `libs/one` first** (always): `libs/one/mag_assets/i18n/<char>/<key>.yml` — if found, skip creation regardless of scope. The shared lib serves all apps.
 2. Look in compiled JSON: `<scope>/public/assets/i18n/en.json` (or `assets/i18n/en.json` for libs/one)
 3. Also check if YAML source already exists: `<scope>/mag_assets/i18n/<char>/<key>.yml`
@@ -69,89 +99,66 @@ Skip if found in any of the above.
 ⚠ DUPLICATE: <key>.yml found in [app-a, app-b] — move the copy with most translations to libs/one/mag_assets/i18n/<char>/<key>.yml and delete app copies.
 ```
 
-### Step 4 — Get language list for scope
+### Step 5 — Create missing YAML files (en only)
 
-Sample an existing YAML in the same scope to get the authoritative language codes:
+For each missing key, write `<scope>/mag_assets/i18n/<first_char>/<key>.yml` with **ONLY the `en:` line. Do NOT add any other language** — the CLI fills them in Step 6.
 
-```bash
-cat libs/one/mag_assets/i18n/h/high_52w.yml        # for libs/one scope
-cat apps/m-finance/mag_assets/i18n/p/profit.yml    # for apps/m-finance scope
-```
+**English value**:
+- Key came from raw text (Step 2) → use the original template text verbatim.
+- Key came from existing `| translate` usage → humanize the key: replace `_` with space, title-case each word. Preserve known abbreviations: `PE`, `PB`, `EPS`, `SMA`, `PNL`, `CAGR`, `ETF`. `strongly_bullish` → `Strongly Bullish`, `pe_ratio` → `PE Ratio`, `high_52w` → `52W High`, `sma_50` → `SMA 50`.
 
-Use the exact same language codes and order from that file for all new YAMLs.
-
-### Step 5 — Create missing YAML files with proper translations
-
-For each missing key, write `<scope>/mag_assets/i18n/<first_char>/<key>.yml`.
-
-**English value**: Humanize the key:
-- Replace `_` with space, title-case each word
-- Preserve known abbreviations: `PE`, `PB`, `EPS`, `SMA`, `PNL`, `CAGR`, `ETF`
-- `strongly_bullish` → `Strongly Bullish`, `pe_ratio` → `PE Ratio`, `high_52w` → `52W High`, `sma_50` → `SMA 50`
-
-**All other languages**: Provide **proper translations** using multilingual knowledge. Do NOT copy the English value — translate the concept accurately for each language.
-
-Example for `strongly_bullish` in `apps/m-finance/`:
-```yaml
-en: Strongly Bullish
-bn: দৃঢ়ভাবে ঊর্ধ্বমুখী
-hi: मजबूत तेजी
-fr: Fortement Haussier
-es: Fuertemente Alcista
-it: Fortemente Rialzista
-ja: 強い強気
-ko: 강한 강세
-pt: Fortemente Altista
-ru: Сильный бычий тренд
-zh: 强烈看涨
-```
-
-Example for `net_margin` in `apps/m-finance/`:
+Example `apps/m-finance/mag_assets/i18n/n/net_margin.yml`:
 ```yaml
 en: Net Margin
-bn: নিট মার্জিন
-hi: शुद्ध मार्जिन
-fr: Marge Nette
-es: Margen Neto
-it: Margine Netto
-ja: 純利益率
-ko: 순이익률
-pt: Margem Líquida
-ru: Чистая маржа
-zh: 净利润率
 ```
 
-Example for `financial_history` in `apps/m-finance/`:
-```yaml
-en: Financial History
-bn: আর্থিক ইতিহাস
-hi: वित्तीय इतिहास
-fr: Historique Financier
-es: Historial Financiero
-it: Storia Finanziaria
-ja: 財務履歴
-ko: 재무 이력
-pt: Histórico Financeiro
-ru: Финансовая История
-zh: 财务历史
+That is the entire file.
+
+### Step 6 — Run fix-i18n CLI
+
+From the nx repo root:
+
+```bash
+npm run translate:fix:dry   # preview: which keys/langs will be filled
+npm run translate:fix       # machine-translates all missing languages
 ```
 
-**Conciseness principle**: Financial/UI labels should be short. Keep translations concise — match the character density of nearby labels.
+The CLI (`fix-i18n`) finds incomplete YAMLs, gets the full language set from `libs/cli/mag_assets/i18n/lang.yml`, and fills missing langs via translation providers.
 
-### Step 6 — Report
+### Step 7 — Rectify
+
+After CLI run, re-read each created/modified YAML:
+
+- Every file has the full language set (compare against an established file, e.g. `libs/one/mag_assets/i18n/h/high_52w.yml`).
+- Spot-check translations — fix any that are empty, garbled, left identical to English where a real translation exists, or wildly long. Financial/UI labels must stay short — match character density of nearby labels.
+- CLI failed for some langs → fill those manually with proper concise translations.
+
+### Step 8 — Verify nothing breaks + lint
+
+```bash
+npm run assets:compile          # rebuild i18n JSON — must succeed
+npm run lint:finance            # or lint / lint:comics / lint:wallet / lint:radio / lint:libs per touched scope
+```
+
+- `assets:compile` errors → fix YAML (bad chars, missing colon, duplicate key) and rerun.
+- Templates were edited (Step 2) → confirm compiled JSON contains the new keys, and lint passes for every app/lib whose templates changed.
+- Anything red → fix, rerun, only then complete.
+
+### Step 9 — Report
 
 ```
 Scanned: <N> files
+Raw text wrapped with translate pipe: <R>
+  ✓ apps/m-finance/.../widget.html — "Net Margin" → 'net_margin' | translate
 Found: <M> translate keys
 Already present: <X>
-Created: <Y> YAML files
+Created (en-only): <Y> YAML files
   ✓ apps/m-finance/mag_assets/i18n/s/strongly_bullish.yml
-  ✓ apps/m-finance/mag_assets/i18n/n/neutral.yml
-  ...
+CLI translate:fix: <Z> langs filled across <Y> files
+Rectified manually: <K> entries
+assets:compile: ✓   lint: ✓
 Dynamic/untraceable (manual action needed):
   - item.label | translate  (instrument-rankings.ts:42)
-
-Run `npm run assets:compile` to rebuild i18n JSON.
 ```
 
 ## Important Notes
@@ -159,4 +166,5 @@ Run `npm run assets:compile` to rebuild i18n JSON.
 - YAML filename = the exact translation key (snake_case)
 - Never overwrite existing YAML files — check before writing
 - Create the `mag_assets/i18n/<char>/` directory if it doesn't exist
-- Do NOT run `npm run assets:compile` automatically — remind the user at the end
+- New YAMLs contain ONLY `en:` — never hand-write other languages before the CLI runs; only fill gaps in Step 7
+- Do not stop after creating YAMLs — Steps 6–8 (CLI, rectify, verify, lint) are mandatory before declaring done
