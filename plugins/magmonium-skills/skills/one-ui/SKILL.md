@@ -163,6 +163,30 @@ onAction = (button: Button | undefined, id: string): void => {
 - `color` → theme color token
 - `remote` → app ID (e.g. `'m-wallet'`); loads SVG from remote WC bundle with `one → remote` fallback
 
+### `m-img` / `ImgComponent`
+```html
+<!-- From URL -->
+<m-img [src]="imageUrl()" alt="description" />
+
+<!-- From raw base64 string (component builds the data URI) -->
+<m-img [data]="base64String()" alt="UPI QR code" />
+
+<!-- From raw base64 with custom MIME type -->
+<m-img [data]="pngData()" dataType="image/png" alt="receipt" />
+
+<!-- Non-fill with explicit dimensions -->
+<m-img [src]="thumb()" alt="thumbnail" [fill]="false" [width]="200" [height]="200" />
+```
+- `[src]` → full URL or data URI (`data:image/...;base64,...`); optional when `[data]` is provided
+- `[data]` → raw base64 string (no `data:` prefix); component constructs the data URI automatically
+- `dataType` → MIME type used with `[data]` (default `'image/jpeg'`)
+- `alt` → required; accessible label
+- `[fill]` → `boolean`, default `true`; stretches to container
+- `[priority]` → `boolean`, default `false`; skips skeleton, sets LCP hint
+- `[width]` / `[height]` → used when `fill` is `false` (defaults `1200` / `1800`)
+- Shows skeleton while loading, inline broken-image SVG on error
+- **Never add a class to `<m-img>` directly** — wrap in a `<div class="...">` instead
+
 ### `m-card` / `CardComponent`
 ```html
 <m-card variant="dashboard" [fullHeight]="true">
