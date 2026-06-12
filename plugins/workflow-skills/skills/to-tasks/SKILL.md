@@ -43,7 +43,7 @@ Type vocabulary + what each does:
 | `migration` | Change to EXISTING screen/component. Same UI rules as frontend, mock data. |
 | `integration` | Bind frontend to real API. Real data in, mocks out. |
 | `assets` | Create frontend assets (icons, images, illustrations). |
-| `translation` | Create i18n keys + asset files for new UI strings. |
+| `translation` | Create i18n keys + asset files for new UI strings. Task body must instruct agent to run `/translate` skill — it discovers raw text + missing keys, creates en-only YAMLs, runs `npm run translate:fix`, verifies + lints. |
 
 New screen → `frontend`. Existing screen changed → `migration`.
 
