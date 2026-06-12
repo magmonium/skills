@@ -37,6 +37,7 @@ One UI reusable-component check — do DURING slicing, before writing files:
 - Shaping frontend task → scan PRD UI for pieces reusable beyond this feature (generic card, picker, status badge…).
 - Candidate found → ASK USER: "X looks reusable — create One UI component task for it?"
 - Yes → add `one-ui` task: build component in One UI library; frontend task depends on it.
+- `one-ui` task is PURELY presentational — UI/UX + aesthetics ONLY. Zero business logic: no API calls, no state management, no domain rules, no feature-specific behavior. Component takes data via inputs, emits events via outputs — consumer (frontend task) owns all logic. Task body must state this constraint.
 - No → frontend task builds it locally inside the app.
 
 Rules:
