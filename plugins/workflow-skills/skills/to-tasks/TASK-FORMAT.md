@@ -44,7 +44,7 @@ All prose caveman. Section order fixed — agents rely on it. Keep whole file SM
 - `backend` — endpoints/logic/DB changes, contract (request/response shapes) integration task binds to.
 - `integration` — which frontend task's mocks swap for which backend task's endpoints, loading/error states, feature works end-to-end.
 - `migration` — review scope (files/modules earlier tasks touched), checks: architecture deviation (FSD, module boundaries), DRY violations, security issues, run `/fe-review` skill on FE delta. Fix/migrate what found. Only created when implementation warrants — skip small/clean work.
-- `one-ui` — component API (inputs/outputs), where it lands in One UI library, demo/story if library convention, which frontend task consumes it. Only created after user said yes.
+- `one-ui` — component API (inputs/outputs), where it lands in One UI library, demo/story if library convention, which frontend task consumes it. Only created after user said yes. PURELY presentational: UI/UX + aesthetics only — zero business logic, no API calls, no state management, no domain rules. Data in via inputs, events out via outputs; consuming frontend task owns all logic.
 
 ## Done When rules
 
