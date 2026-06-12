@@ -4,10 +4,10 @@ File: `tasks/draft/NNNN_SS_<type>_<kebab-desc>.md`
 
 - `NNNN` — PRD index, 4 digits (matches PRD file).
 - `SS` — sequence, 2 digits, dependency order (01 first).
-- `<type>` — modelling | backend | frontend | migration | integration | assets | translation.
+- `<type>` — frontend | backend | integration | migration | one-ui.
 - `<kebab-desc>` — short kebab-case task name.
 
-Example: `0003_01_modelling_app-deploy-status.md`, `0003_04_frontend_deploy-status-card.md`
+Example: `0003_01_backend_deploy-status-api.md`, `0003_01_frontend_deploy-status-screen.md` (same SS = parallel), `0003_02_integration_deploy-status-wire.md`
 
 All prose caveman. Section order fixed — agents rely on it. Keep whole file SMALL — agent reads in seconds.
 
@@ -33,19 +33,18 @@ All prose caveman. Section order fixed — agents rely on it. Keep whole file SM
 
 ## Field rules
 
-- **Mode: reference** — task output consumed by other tasks (e.g. modelling types → swagger/interface). Says so in What.
+- **Mode: reference** — task output consumed by other tasks. Says so in What.
 - **Human:** name the exact human step (approve design, provide API key, manual QA on device). `none` when agent finishes alone.
-- **Depends:** task IDs only (`NNNN_SS`). Blocked task starts after blockers done.
+- **Depends:** task IDs only (`NNNN_SS`). Blocked task starts after blockers done. Frontend ∥ backend — no dependency between them.
 - **Refs:** always main PRD; ADRs only when task leans on one.
 
 ## Per-type What must include
 
-- `modelling` — entities, fields, types for FE+BE; note swagger/interface generated from this.
-- `backend` — endpoints/logic, which modelling task defines contract.
-- `frontend` / `migration` — screen/component, MOCK data, reuse which existing components, app theme, minimal HTML/CSS, small reusable components, logic in separate functions, FSD layering. `frontend` = new screen; `migration` = change existing.
-- `integration` — which frontend task's mocks swap for which backend task's real API.
-- `assets` — which assets, format, where they land.
-- `translation` — which screens' strings, i18n key names, asset file location.
+- `frontend` — screen/components, MOCK data shape, which One UI components reused, app theme, assets needed (icons/images — create in this task), translation step (run `/translate` skill after UI built), minimal HTML/CSS, small reusable components, logic in separate functions, FSD layering. Zero API calls.
+- `backend` — endpoints/logic/DB changes, contract (request/response shapes) integration task binds to.
+- `integration` — which frontend task's mocks swap for which backend task's endpoints, loading/error states, feature works end-to-end.
+- `migration` — review scope (files/modules earlier tasks touched), checks: architecture deviation (FSD, module boundaries), DRY violations, security issues, run `/fe-review` skill on FE delta. Fix/migrate what found. Only created when implementation warrants — skip small/clean work.
+- `one-ui` — component API (inputs/outputs), where it lands in One UI library, demo/story if library convention, which frontend task consumes it. Only created after user said yes.
 
 ## Done When rules
 
