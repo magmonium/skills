@@ -28,6 +28,7 @@ All prose caveman. Section order fixed — agents rely on it. Keep whole file SM
 
 - [ ] Observable outcome 1
 - [ ] Observable outcome 2
+- [ ] Lint, build, test pass — project's configured commands
 ````
 
 ## Field rules
