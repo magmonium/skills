@@ -52,3 +52,4 @@ All prose caveman. Section order fixed — agents rely on it. Keep whole file SM
 - External behavior only — no implementation detail.
 - Each box checkable by agent or named human.
 - 2–5 boxes. More → task too big, split it.
+- Last box ALWAYS quality gate: lint + build + test pass. Use project's configured commands (package.json scripts, repo scripts, CLAUDE.md) — never invent commands. Skip only when `Mode: reference` produces no code. Gate box doesn't count toward 2–5.
