@@ -11,12 +11,13 @@ Sibling: `/tdd-implement` — same lifecycle, TDD red-green-refactor instead of 
 
 ## 1. Pick task
 
-- Argument (task id `NNNN_SS` or path) → use that task.
-- No argument → lowest `NNNN_SS` in `tasks/draft/` whose **Depends** are ALL in `tasks/done/`.
+- Argument (task id `NNNN_SS` or path) → use that task, wherever it sits (`tasks/in-progress/` or `tasks/draft/`).
+- No argument → check `tasks/in-progress/` FIRST. Task there → resume it: read task file, see which **Done When** boxes already ticked, diff code vs task to gauge real progress (boxes may lag code — verify), finish remaining work only. Multiple → lowest `NNNN_SS`. Task waiting ONLY on pending human step → report step, skip it, fall through to draft pick.
+- `tasks/in-progress/` empty → lowest `NNNN_SS` in `tasks/draft/` whose **Depends** are ALL in `tasks/done/`.
 - Tasks exist but none eligible → list what blocks each, stop.
-- Folder empty/missing → tell user, stop.
+- Both folders empty/missing → tell user, stop.
 
-Move picked file `tasks/draft/` → `tasks/in-progress/` (create folder if missing; `git mv` when tracked). Then start.
+Draft pick → move file `tasks/draft/` → `tasks/in-progress/` (create folder if missing; `git mv` when tracked). Resumed task already there — no move. Then start.
 
 ## 2. Read context
 
