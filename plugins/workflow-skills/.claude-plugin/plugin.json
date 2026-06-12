@@ -1,6 +1,6 @@
 {
   "name": "workflow-skills",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "PRD-driven dev workflow: grill-to-prd, to-tasks, to-implement, tdd-implement, to-review, tdd, start",
   "author": {
     "name": "Magmonium",
