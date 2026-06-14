@@ -1,6 +1,6 @@
 ---
 name: tdd-implement
-description: Pick lowest-index ready task from tasks/draft/, move it to tasks/in-progress/, implement it with strict TDD red-green-refactor (via the tdd skill), then move it to tasks/done/ — and move the epic's PRD from prd/in-progress/ to prd/done/ when all its tasks finish. Use when user says "tdd implement", "implement next task with TDD", or wants the next drafted task built test-first.
+description: Pick lowest-index ready task from tasks/draft/, move it to tasks/in-progress/, implement it with strict TDD red-green-refactor (via the tdd skill), then move it to tasks/done/. Use when user says "tdd implement", "implement next task with TDD", or wants the next drafted task built test-first.
 ---
 
 # TDD Implement
