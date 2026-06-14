@@ -5,7 +5,7 @@ description: Pick lowest-index ready task from tasks/draft/, move it to tasks/in
 
 # TDD Implement
 
-Pick next ready task from `tasks/draft/` → move to `tasks/in-progress/` → implement TDD → `tasks/done/` → all epic tasks done → PRD to `prd/done/`.
+Pick next ready task from `tasks/draft/` → move to `tasks/in-progress/` → implement TDD → `tasks/done/`.
 
 Sibling: `/to-implement` — same lifecycle, straight build instead of TDD.
 
@@ -21,7 +21,7 @@ Draft pick → move file `tasks/draft/` → `tasks/in-progress/` (create folder 
 
 ## 2. Read context
 
-- Task file fully. Then its **Refs** — PRD in `prd/in-progress/`, ADRs listed.
+- Task file fully — **Context** section carries the why (no PRD). Then its **Refs** — ADRs listed, if any.
 - **Depends** tasks in `tasks/done/` — esp. `Mode: reference` ones (modelling contracts).
 - Explore code around the change: existing patterns, reusable components, theme, API/model conventions, test setup, project CLAUDE.md. Match what exists — no new pattern when one already covers it.
 
@@ -51,13 +51,13 @@ Code rules (apply during GREEN + refactor):
 - `Human:` ≠ none and human step pending → task STAYS in `tasks/in-progress/`, report exact human step.
 - Else move task file → `tasks/done/` (create folder if missing).
 
-## 6. Close epic
+## 6. Feature status
 
-No `NNNN_*` tasks left in `tasks/draft/` or `tasks/in-progress/`? → move `prd/in-progress/NNNN_<slug>.md` → `prd/done/` (create folder if missing). Else note remaining count.
+No `NNNN_*` tasks left in `tasks/draft/` or `tasks/in-progress/` for this NNNN → feature fully done, ready for `/to-review`. Else note remaining count.
 
 ## 7. Report — caveman, minimal
 
 - Task id + one line what built. Files touched (paths only). Test count added/passing.
 - Done When: each box pass/fail.
-- Epic: N done / M total; PRD moved or stays.
+- Feature: N done / M total tasks for this NNNN.
 - NO commit — user commits. No prose padding.

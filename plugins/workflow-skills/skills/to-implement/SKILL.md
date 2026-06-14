@@ -1,11 +1,11 @@
 ---
 name: to-implement
-description: Pick lowest-index ready task from tasks/draft/, move it to tasks/in-progress/, implement it straight following existing codebase patterns, then move it to tasks/done/ — and move the epic's PRD from prd/in-progress/ to prd/done/ when all its tasks finish. Use when user says "to implement", "implement next task", or wants the next drafted task built directly (no TDD).
+description: Pick lowest-index ready task from tasks/draft/, move it to tasks/in-progress/, implement it straight following existing codebase patterns, then move it to tasks/done/. Use when user says "to implement", "implement next task", or wants the next drafted task built directly (no TDD).
 ---
 
 # To Implement
 
-Pick next ready task from `tasks/draft/` → move to `tasks/in-progress/` → implement → `tasks/done/` → all epic tasks done → PRD to `prd/done/`.
+Pick next ready task from `tasks/draft/` → move to `tasks/in-progress/` → implement → `tasks/done/`.
 
 Sibling: `/tdd-implement` — same lifecycle, TDD red-green-refactor instead of straight build.
 
