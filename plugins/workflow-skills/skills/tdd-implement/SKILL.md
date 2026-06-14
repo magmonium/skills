@@ -5,7 +5,7 @@ description: Pick lowest-index ready task from tasks/draft/, move it to tasks/in
 
 # TDD Implement
 
-Pick next ready task from `tasks/draft/` → move to `tasks/in-progress/` → implement TDD → `tasks/done/` → all epic tasks done → PRD to `prd/done/`.
+Pick next ready task from `tasks/draft/` → move to `tasks/in-progress/` → implement TDD → `tasks/done/`.
 
 Sibling: `/to-implement` — same lifecycle, straight build instead of TDD.
 
