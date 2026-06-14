@@ -136,11 +136,12 @@ After CLI run, re-read each created/modified YAML:
 ### Step 8 — Verify nothing breaks + lint
 
 ```bash
-npm run assets:compile          # rebuild i18n JSON — must succeed
-npm run lint:finance            # or lint / lint:comics / lint:wallet / lint:radio / lint:libs per touched scope
+npm run i18n:compile             # validate + auto-fix + compile i18n yml → json, fast signal
+npm run lint:finance              # or lint / lint:comics / lint:wallet / lint:radio / lint:libs per touched scope
 ```
 
-- `assets:compile` errors → fix YAML (bad chars, missing colon, duplicate key) and rerun.
+- `i18n:compile` runs validator (`compile-i18n` CLI): parses every i18n yml, auto-fixes common syntax issues (unquoted trailing colon, tabs, dup lang keys) writing fixes back to source, compiles good files to json, and logs unresolved failures to `i18n-compile-errors.log` at repo root. Non-zero exit = unresolved failures — open the log, fix flagged files by hand, rerun.
+- Scope to touched app only: `npm run i18n:compile -- --app <app-name>` (e.g. `m-finance`). Use `i18n:compile:dry` first if you want a preview without writing fixes/json.
 - Templates were edited (Step 2) → confirm compiled JSON contains the new keys, and lint passes for every app/lib whose templates changed.
 - Anything red → fix, rerun, only then complete.
 
