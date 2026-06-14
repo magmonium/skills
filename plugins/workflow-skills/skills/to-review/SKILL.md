@@ -1,34 +1,34 @@
 ---
 name: to-review
-description: Pick highest-index PRD from prd/done/, verify each of its done tasks against actual code, audit implemented code for security/architecture/DRY flaws, then create draft gap/refactor tasks and move PRD back to prd/in-progress/ when work found. Use when user says "to review", "review done prd", or wants a finished epic verified against the codebase.
+description: Pick the highest-NNNN feature whose tasks are fully in tasks/done/, verify each done task against actual code, audit the implemented code for security/architecture/DRY flaws, then create draft gap/refactor tasks continuing that feature's SS sequence. Use when user says "to review", "review done tasks", or wants a finished feature verified against the codebase.
 ---
 
 # To Review
 
-Pick highest-numbered PRD from `prd/done/` → tally its done tasks against real code → audit code for security/architecture/DRY flaws → gaps become draft tasks, agreed findings become refactor tasks → any new task → PRD back to `prd/in-progress/`.
+Pick the highest NNNN feature group sitting in `tasks/done/` → tally its tasks against real code → audit code for security/architecture/DRY flaws → gaps become draft tasks, agreed findings become refactor tasks, both continuing that NNNN's SS sequence in `tasks/draft/`.
 
-Inverse of `/to-implement`: that skill moves work forward, this one checks finished work and reopens the epic when reality disagrees.
+Inverse of `/to-implement`: that skill moves work forward, this one checks finished work and reopens the feature with new draft tasks when reality disagrees.
 
-## 1. Pick PRD
+## 1. Pick feature group
 
-- Argument (index or path) → use that PRD.
-- No argument → HIGHEST `NNNN_` prefix in `prd/done/` (newest finished epic).
-- Folder empty/missing → tell user, stop.
+- Argument (`NNNN` or path) → use that NNNN.
+- No argument → HIGHEST `NNNN_` prefix appearing in `tasks/done/`.
+- `tasks/done/` empty/missing → tell user, stop.
 
-Read PRD fully. Collect every `NNNN_*` task file for that index across `tasks/done/`, `tasks/in-progress/`, `tasks/draft/`. Tasks NOT in `tasks/done/` while PRD sits in `prd/done/` → inconsistent state, report it, count those as gaps.
+Collect every `NNNN_*` task file for that NNNN across `tasks/done/`, `tasks/in-progress/`, `tasks/draft/`. Tasks NOT in `tasks/done/` while this NNNN is being reviewed → inconsistent state, report it, count those as gaps.
 
 ## 2. Tally tasks vs code
 
 Per done task:
 
-- Read **What** + **Done When** boxes.
+- Read **Context** + **What** + **Done When** boxes.
 - Verify in CODE, not in task file ticks. Find the implementation (grep/read modules the task names), confirm each box's observable outcome actually exists. Ticked box ≠ proof.
 - Run project test suite for touched area when cheap (use wrapper/commands from project CLAUDE.md).
 - Verdict per task: `complete` | `gap` (+ one line which box fails and why).
 
 ## 3. Audit implemented code
 
-Scope: only modules/files this PRD's tasks touched — not whole repo. Check per [REVIEW-CHECKS.md](./REVIEW-CHECKS.md):
+Scope: only modules/files this NNNN's tasks touched — not whole repo. Check per [REVIEW-CHECKS.md](./REVIEW-CHECKS.md):
 
 - **Security** — injection, authz/authn holes, secrets, unsafe input handling.
 - **Architecture** — violates project ADRs/CLAUDE.md conventions, wrong layering, god-blob components.
@@ -43,23 +43,19 @@ Two kinds, different gates:
 - **Gap tasks** (step 2 failures) — create immediately, no asking. One task per gap.
 - **Refactor tasks** (step 3 findings) — present findings to user first. Security findings: write in plain clear prose (auto-clarity, no caveman). User agrees finding → create task. User rejects → drop it.
 
-Task files follow `to-tasks` format ([TASK-FORMAT](../to-tasks/TASK-FORMAT.md)) in `tasks/draft/`:
+Task files follow `grill-to-tasks` format ([TASK-FORMAT](../grill-to-tasks/TASK-FORMAT.md)), written to `tasks/draft/`:
 
-- Numbering: `NNNN_SS_<type>_<kebab-desc>.md` — NNNN = PRD index, SS = highest existing SS for that NNNN (any folder) + 1.
+- Numbering: `NNNN_SS_<type>_<kebab-desc>.md` — NNNN = the feature being reviewed, SS = highest existing SS for that NNNN (any folder) + 1, incrementing per new task.
 - Gap task type: original vocabulary (backend/frontend/integration/…) matching what's missing.
 - Refactor task type: `refactor`. **What** names the flaw + the fix; security refs the exact finding.
-- **Refs:** PRD at its `prd/in-progress/` path (post-move), ADRs when finding leans on one.
+- **Context:** 2–4 lines — what's missing/wrong and why, distilled from the gap or finding. No PRD to point at.
+- **Refs:** ADRs only, when finding leans on one. Omit if none.
 - **Done When:** external behavior only, 2–5 boxes.
 
-## 5. Move PRD
+## 5. Report — caveman, minimal
 
-- ≥1 new task created → move `prd/done/NNNN_<slug>.md` → `prd/in-progress/` (create folder if missing; `git mv` when tracked).
-- Zero tasks → PRD stays in `prd/done/`.
-
-## 6. Report — caveman, minimal
-
-- PRD id + verdict: `clean` | `reopened`.
+- NNNN reviewed + verdict: `clean` | `reopened` (reopened = new draft tasks added).
 - Task tally: N complete / M total, one line per gap.
 - Findings: accepted / rejected counts, one line each accepted.
-- New task files (paths only). PRD moved or stays.
+- New task files (paths only).
 - NO commit — user commits. No prose padding. Security details exempt from caveman.
