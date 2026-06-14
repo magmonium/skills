@@ -2,12 +2,12 @@
 
 File: `tasks/draft/NNNN_SS_<type>_<kebab-desc>.md`
 
-- `NNNN` — PRD index, 4 digits (matches PRD file).
+- `NNNN` — feature index, 4 digits (shared by all tasks of this feature).
 - `SS` — sequence, 2 digits, dependency order (01 first).
 - `<type>` — frontend | backend | integration | migration | one-ui.
 - `<kebab-desc>` — short kebab-case task name.
 
-Example: `0003_01_backend_deploy-status-api.md`, `0003_01_frontend_deploy-status-screen.md` (same SS = parallel), `0003_02_integration_deploy-status-wire.md`
+Example: `0007_01_backend_deploy-status-api.md`, `0007_01_frontend_deploy-status-screen.md` (same SS = parallel), `0007_02_integration_deploy-status-wire.md`
 
 All prose caveman. Section order fixed — agents rely on it. Keep whole file SMALL — agent reads in seconds.
 
@@ -18,7 +18,11 @@ All prose caveman. Section order fixed — agents rely on it. Keep whole file SM
 - **Mode:** implement | reference
 - **Human:** none | <what human must do>
 - **Depends:** none | NNNN_SS, NNNN_SS
-- **Refs:** prd/in-progress/NNNN_<slug>.md, docs/adr/XXXX (if any)
+- **Refs:** docs/adr/XXXX (if any) — omit line if none
+
+## Context
+
+2–4 lines, caveman. What hurts + what fixes it, distilled from the grill — just the slice relevant to THIS task. No PRD to point at; this is the only context the agent gets.
 
 ## What
 
@@ -36,7 +40,8 @@ All prose caveman. Section order fixed — agents rely on it. Keep whole file SM
 - **Mode: reference** — task output consumed by other tasks. Says so in What.
 - **Human:** name the exact human step (approve design, provide API key, manual QA on device). `none` when agent finishes alone.
 - **Depends:** task IDs only (`NNNN_SS`). Blocked task starts after blockers done. Frontend ∥ backend — no dependency between them.
-- **Refs:** always main PRD; ADRs only when task leans on one.
+- **Refs:** ADRs only, when task leans on one. No PRD — omit the line entirely if no ADR applies.
+- **Context:** carries what a PRD would have — problem/solution/decisions for this slice. Written fresh per task from the grill session, not copy-pasted verbatim across tasks.
 
 ## Per-type What must include
 
