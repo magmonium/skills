@@ -21,7 +21,7 @@ Draft pick → move file `tasks/draft/` → `tasks/in-progress/` (create folder 
 
 ## 2. Read context
 
-- Task file fully. Then its **Refs** — PRD in `prd/in-progress/`, ADRs listed.
+- Task file fully — **Context** section carries the why (no PRD). Then its **Refs** — ADRs listed, if any.
 - **Depends** tasks in `tasks/done/` — esp. `Mode: reference` ones (modelling contracts).
 - Explore code around the change: existing patterns, reusable components, theme, API/model conventions, project CLAUDE.md. Match what exists — no new pattern when one already covers it.
 
