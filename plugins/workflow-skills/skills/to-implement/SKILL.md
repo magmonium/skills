@@ -47,13 +47,13 @@ Rules:
 - `Human:` ≠ none and human step pending → task STAYS in `tasks/in-progress/`, report exact human step.
 - Else move task file → `tasks/done/` (create folder if missing).
 
-## 6. Close epic
+## 6. Feature status
 
-No `NNNN_*` tasks left in `tasks/draft/` or `tasks/in-progress/`? → move `prd/in-progress/NNNN_<slug>.md` → `prd/done/` (create folder if missing). Else note remaining count.
+No `NNNN_*` tasks left in `tasks/draft/` or `tasks/in-progress/` for this NNNN → feature fully done, ready for `/to-review`. Else note remaining count.
 
 ## 7. Report — caveman, minimal
 
 - Task id + one line what built. Files touched (paths only).
 - Done When: each box pass/fail.
-- Epic: N done / M total; PRD moved or stays.
+- Feature: N done / M total tasks for this NNNN.
 - NO commit — user commits. No prose padding.
