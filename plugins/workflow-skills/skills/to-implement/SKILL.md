@@ -51,9 +51,21 @@ Rules:
 
 No `NNNN_*` tasks left in `tasks/draft/` or `tasks/in-progress/` for this NNNN → feature fully done, ready for `/to-review`. Else note remaining count.
 
-## 7. Report — caveman, minimal
+## 7. Commit
+
+Stage task file move + all changed code. Commit, caveman-style message:
+
+```
+<type>(<NNNN_SS>): <what, terse, fragments>
+
+<one-line why, caveman>
+```
+
+`type` = feat/fix/refactor/chore matching change. `<NNNN_SS>` = task id. Body line: why, not what — pull from task **Context**. No Co-Authored-By, no extra trailer beyond repo norm.
+
+## 8. Report — caveman, minimal
 
 - Task id + one line what built. Files touched (paths only).
 - Done When: each box pass/fail.
 - Feature: N done / M total tasks for this NNNN.
-- NO commit — user commits. No prose padding.
+- Commit hash + subject line.
