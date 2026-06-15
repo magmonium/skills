@@ -56,4 +56,5 @@ All prose caveman. Section order fixed — agents rely on it. Keep whole file SM
 - External behavior only — no implementation detail.
 - Each box checkable by agent or named human.
 - 2–5 boxes. More → task too big, split it.
-- Last box ALWAYS quality gate: lint + build + test pass. Use project's configured commands (package.json scripts, repo scripts, CLAUDE.md) — never invent commands. Skip only when `Mode: reference` produces no code. Gate box doesn't count toward 2–5.
+- Last box ALWAYS: "User runs verification (translation:fix / asset compile / build / test per project commands) and confirms result." Agent does NOT run translation:fix, asset compilation, build, or test itself. Skip only when `Mode: reference` produces no code. Gate box doesn't count toward 2–5.
+- After implementing all other boxes, agent lists exact commands user must run (from project CLAUDE.md / package.json / repo scripts — never invented), then stops and waits. User confirms OK → tick gate box, commit per repo norm. User reports broken → agent fixes, lists steps again, waits again — repeat until user confirms.
