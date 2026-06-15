@@ -45,7 +45,7 @@ All prose caveman. Section order fixed — agents rely on it. Keep whole file SM
 
 ## Per-type What must include
 
-- `frontend` — screen/components, MOCK data shape, which One UI components reused, app theme, assets needed (icons/images — create in this task), translation step (run `/translate` skill after UI built), minimal HTML/CSS, small reusable components, logic in separate functions, FSD layering. Zero API calls.
+- `frontend` — screen/components, MOCK data shape, which One UI components reused, app theme, assets needed (icons/images — create in this task), minimal HTML/CSS, small reusable components, logic in separate functions, FSD layering. Zero API calls. Translation: agent does NOT run `/translate` or `translation:fix` itself — see Done When rules.
 - `backend` — endpoints/logic/DB changes, contract (request/response shapes) integration task binds to.
 - `integration` — which frontend task's mocks swap for which backend task's endpoints, loading/error states, feature works end-to-end.
 - `migration` — review scope (files/modules earlier tasks touched), checks: architecture deviation (FSD, module boundaries), DRY violations, security issues, run `/fe-review` skill on FE delta. Fix/migrate what found. Only created when implementation warrants — skip small/clean work.
