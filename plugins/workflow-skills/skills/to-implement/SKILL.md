@@ -39,8 +39,10 @@ Rules:
 
 ## 4. Verify
 
-- Every **Done When** box must pass — check each, tick it in task file.
-- Run project test suite + lint/format for touched area (use project's wrapper/commands from CLAUDE.md). Fail → fix before moving on.
+- Every **Done When** box except the final gate box must pass — check each, tick it in task file.
+- Final gate box (translation:fix / asset compile / build / test) — agent does NOT run these itself. List exact commands (from project CLAUDE.md / package.json / repo scripts — never invented), then stop and wait for user.
+- User confirms OK → tick gate box, proceed.
+- User reports broken → fix, list steps again, wait again — repeat until user confirms.
 
 ## 5. Close task
 

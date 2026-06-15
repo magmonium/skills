@@ -1,6 +1,6 @@
 {
   "name": "workflow-skills",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "Task-driven dev workflow: grill-to-tasks, to-implement, tdd-implement, to-review, tdd, start",
   "author": {
     "name": "Magmonium",
