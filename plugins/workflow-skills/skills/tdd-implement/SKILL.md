@@ -43,8 +43,10 @@ Code rules (apply during GREEN + refactor):
 
 ## 4. Verify
 
-- Every **Done When** box must pass — check each, tick it in task file.
-- Full project test suite + lint/format for touched area. All GREEN before moving on.
+- Every **Done When** box except the final gate box must pass — check each, tick it in task file. TDD loop already runs the per-slice tests as part of red-green-refactor.
+- Final gate box (translation:fix / asset compile / full build / full test suite) — agent does NOT run these itself. List exact commands (from project CLAUDE.md / package.json / repo scripts — never invented), then stop and wait for user.
+- User confirms OK → tick gate box, proceed.
+- User reports broken → fix, list steps again, wait again — repeat until user confirms.
 
 ## 5. Close task
 
