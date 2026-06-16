@@ -15,7 +15,7 @@
     },
     {
       "name": "workflow-skills",
-      "description": "PRD-driven dev workflow: grill-to-prd → to-tasks → to-implement/tdd-implement → to-review, plus tdd and start (project scaffolding)",
+      "description": "Task-driven dev workflow: grill-to-tasks → to-implement/tdd-implement → to-review, plus tdd and start (project scaffolding)",
       "source": "./plugins/workflow-skills",
       "category": "productivity"
     }

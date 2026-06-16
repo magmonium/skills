@@ -73,6 +73,17 @@ To color a component instance, set the component var on the host:
 
 ---
 
+## Boot splash (every app `index.html`)
+
+Every app's `apps/*/src/index.html` must include the `#m-splash` overlay — animated logo shown until `ThemeStore.isReady()`, then hidden.
+
+- Markup: `<div id="m-splash">` with the gradient-triangle `#m-splash-logo` SVG + `<style>` block, placed **before** the root element (`<ui-root>` / `<m-one-root>`) in `<body>`. Copy verbatim from `apps/m-ui/src/index.html`.
+- Hide logic lives once in `OneApp` (`libs/one/src/lib/shared/lib/remote/one-app.ts`) — effect on `ThemeStore.isReady()` adds `.hidden` to `#m-splash`. Apps using `<m-one-root>` get this for free.
+- `apps/m-ui` uses its own root (`<ui-root>`, not `m-one-root`) — its hide effect lives in `apps/m-ui/src/app/app.ts`.
+- New apps: add the splash block to `index.html`; if root is `m-one-root` no extra wiring needed, otherwise replicate the `ThemeStore.isReady()` effect in the root component.
+
+---
+
 ## Rules (non-negotiable)
 
 1. **Never use native HTML** where a `@magmonium/one` component exists:
@@ -162,6 +173,30 @@ onAction = (button: Button | undefined, id: string): void => {
 - `size` → `xs | sm | md | lg | xl`
 - `color` → theme color token
 - `remote` → app ID (e.g. `'m-wallet'`); loads SVG from remote WC bundle with `one → remote` fallback
+
+### `m-img` / `ImgComponent`
+```html
+<!-- From URL -->
+<m-img [src]="imageUrl()" alt="description" />
+
+<!-- From raw base64 string (component builds the data URI) -->
+<m-img [data]="base64String()" alt="UPI QR code" />
+
+<!-- From raw base64 with custom MIME type -->
+<m-img [data]="pngData()" dataType="image/png" alt="receipt" />
+
+<!-- Non-fill with explicit dimensions -->
+<m-img [src]="thumb()" alt="thumbnail" [fill]="false" [width]="200" [height]="200" />
+```
+- `[src]` → full URL or data URI (`data:image/...;base64,...`); optional when `[data]` is provided
+- `[data]` → raw base64 string (no `data:` prefix); component constructs the data URI automatically
+- `dataType` → MIME type used with `[data]` (default `'image/jpeg'`)
+- `alt` → required; accessible label
+- `[fill]` → `boolean`, default `true`; stretches to container
+- `[priority]` → `boolean`, default `false`; skips skeleton, sets LCP hint
+- `[width]` / `[height]` → used when `fill` is `false` (defaults `1200` / `1800`)
+- Shows skeleton while loading, inline broken-image SVG on error
+- **Never add a class to `<m-img>` directly** — wrap in a `<div class="...">` instead
 
 ### `m-card` / `CardComponent`
 ```html

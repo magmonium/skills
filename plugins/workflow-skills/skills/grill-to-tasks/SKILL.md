@@ -1,29 +1,37 @@
 ---
-name: to-tasks
-description: Pick next PRD from prd/draft/, break it into at most four typed task files (frontend, backend, integration, migration) under tasks/draft/ — plus optional one-ui reusable-component task if user approves — then move the PRD to prd/in-progress/ once fully divided. Use when user wants to convert a PRD draft into task files, says "to tasks", or asks to break the next PRD into tasks.
+name: grill-to-tasks
+description: Interview the user relentlessly about a plan or feature until shared understanding, then slice it directly into at most four typed task files (frontend, backend, integration, migration — plus optional one-ui) under tasks/draft/. No PRD step. Numbering NNNN_SS — NNNN = highest existing across tasks/draft, tasks/in-progress, tasks/done, plus one. Use when user wants to grill an idea straight into tasks, says "grill to tasks", or wants to skip the PRD step entirely.
 ---
 
-# To Tasks
+# Grill to Tasks
 
-Pick next PRD from `prd/draft/` → write task files to `tasks/draft/` → when PRD FULLY divided into tasks, move it to `prd/in-progress/`.
+Two phases: grill, then slice straight into task files. No PRD, no issue tracker — output is task files in `tasks/draft/`, each carrying its own context.
 
-## Process
+## Phase 1 — Grill
 
-### 1. Pick PRD
+Interview the user relentlessly about every aspect of the plan until shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
 
-- Argument given (index or path) → use that PRD.
-- No argument → lowest `NNNN_` prefix in `prd/draft/` (oldest waits longest).
-- Folder empty or missing → tell user, stop.
+Ask questions one at a time, waiting for an answer before continuing.
 
-Read PRD fully. Check `docs/adr/` (or project ADR folder) for decisions touching same area — tasks must respect them.
+If a question can be answered by exploring the codebase, explore the codebase instead of asking.
+
+Track resolved decisions as you go — they feed the tasks' **Context** sections and **Done When** boxes. Also track: problem (what hurts), solution (what fixes it), user stories, testing approach, out-of-scope items.
+
+## Phase 2 — Slice into tasks
+
+When all branches are resolved (or user says "write the tasks" / "enough"):
+
+### 1. Determine NNNN
+
+Scan `tasks/draft/`, `tasks/in-progress/`, `tasks/done/` for `NNNN_` prefixes. NNNN = highest found + 1, zero-padded to 4 digits. None found anywhere → `0001`.
 
 ### 2. Explore codebase
 
 Find: existing reusable components (One UI library first), theme, API patterns, i18n setup, model conventions. Task descriptions must use real project vocabulary, not invented names.
 
-### 3. Slice into tasks — MAX FOUR per PRD
+### 3. Slice into tasks — MAX FOUR
 
-Fixed task set. Create each ONLY when PRD needs it (pure-backend PRD → no frontend/integration task; etc.):
+Fixed task set. Create each ONLY when the feature needs it (pure-backend feature → no frontend/integration task; etc.):
 
 | # | Type | Job |
 |---|------|-----|
@@ -34,7 +42,7 @@ Fixed task set. Create each ONLY when PRD needs it (pure-backend PRD → no fron
 
 One UI reusable-component check — do DURING slicing, before writing files:
 
-- Shaping frontend task → scan PRD UI for pieces reusable beyond this feature (generic card, picker, status badge…).
+- Shaping frontend task → scan the feature's UI for pieces reusable beyond this feature (generic card, picker, status badge…).
 - Candidate found → ASK USER: "X looks reusable — create One UI component task for it?"
 - Yes → add `one-ui` task: build component in One UI library; frontend task depends on it.
 - `one-ui` task is PURELY presentational — UI/UX + aesthetics ONLY. Zero business logic: no API calls, no state management, no domain rules, no feature-specific behavior. Component takes data via inputs, emits events via outputs — consumer (frontend task) owns all logic. Task body must state this constraint.
@@ -42,10 +50,10 @@ One UI reusable-component check — do DURING slicing, before writing files:
 
 Rules:
 
-- Full coverage: every PRD user story / decision lands in some task. Nothing left unassigned.
+- Full coverage: every user story / decision from the grill lands in some task. Nothing left unassigned.
 - Each task lists what blocks it. Sequence number = dependency order.
 - Task needing human (design review, credentials, store approval, manual QA) → mark `Human:` with what human must do. Prefer no-human tasks.
-- Every task refs main PRD + any ADR it leans on.
+- Every task carries its own **Context** (see TASK-FORMAT.md) — no PRD to refer back to.
 
 UI rules (frontend + one-ui tasks must state them):
 
@@ -58,16 +66,10 @@ Order: one-ui (if any) → frontend ∥ backend → integration → migration (i
 
 ### 4. Write task files
 
-Numbering: `NNNN_SS_<type>_<kebab-desc>.md` in `tasks/draft/` — NNNN = PRD index, SS = 2-digit sequence in dependency order. Create folder if missing.
+Numbering: `NNNN_SS_<type>_<kebab-desc>.md` in `tasks/draft/` — NNNN from step 1, SS = 2-digit sequence in dependency order (01 first). Create folder if missing.
 
 Format per task: see [TASK-FORMAT.md](./TASK-FORMAT.md). Prose caveman: drop articles/filler/hedging, fragments OK, technical terms exact.
 
-### 5. Move PRD — only when fully divided
+### 5. Report
 
-Gate: ALL tasks written, full PRD coverage verified (step 3 rule). Partial breakdown → PRD STAYS in `prd/draft/`, tell user what remains.
-
-When gate passes: move `prd/draft/NNNN_<slug>.md` → `prd/in-progress/NNNN_<slug>.md` (create folder if missing; `git mv` when repo tracks it). Task `Refs:` lines point at in-progress path.
-
-### 6. Report
-
-Reply with: PRD moved (old → new path), then one line per task — filename, type, mode, human flag, depends. Note migration task skipped + why, when skipped.
+Reply with: NNNN chosen + why (highest found + 1, or 0001), then one line per task — filename, type, mode, human flag, depends. Note migration task skipped + why, when skipped.
