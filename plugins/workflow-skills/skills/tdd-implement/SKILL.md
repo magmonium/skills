@@ -27,24 +27,29 @@ Draft pick → move file `tasks/draft/` → `tasks/in-progress/` (create folder 
 
 ## 3. Implement — TDD
 
-Invoke `tdd` skill (Skill tool). Follow it exactly: vertical slices, one test → minimal impl → repeat, refactor only on GREEN.
+Invoke `tdd` skill (Skill tool). Follow it exactly: vertical slices, one test → minimal impl → repeat, refractor only on GREEN.
 
 Adaptations for task-driven run:
 
 - Task file = approved plan. **Done When** boxes = behavior list to test. Don't block waiting for user plan approval.
-- Tests through public interface only — survive refactor. Run via project's test wrapper/commands from CLAUDE.md.
+- Tests through public interface only — survive refractor. Run via project's test wrapper/commands from CLAUDE.md.
 - `Mode: reference` task (pure types/contracts, nothing executable) → no TDD loop; produce reference artifact, done.
 
-Code rules (apply during GREEN + refactor):
+Code rules (apply during GREEN + refractor):
 
+- **Magmonium Standard:** Use Signals (`signal`, `computed`, `effect`) for state. No `standalone: true`. Use `inject()` for DI. Use `ChangeDetectionStrategy.OnPush`.
+- **Assets First:** Never hardcode UI config (buttons, forms, navs) in TS. Define in `mag_assets/*.yml`. Run `npm run assets:compile`.
+- **UI Components:** No native `<h1>-<h6>`, `<button>`, `<input>`, or `<img>`. Use `m-header`, `m-button`, `m-input`, `m-img`.
+- **Text:** All text via `| translate` pipe — no raw strings in templates.
+- **Styling:** `.sass` only, BEM naming, max 3 nesting levels. Import `@use 'index' as m`.
+- **FSD Layering:** `pages` → `widgets` → `features` → `entities` → `shared`.
 - DRY, efficient, modern idiom for the stack. Smallest diff that satisfies task.
-- UI tasks: reuse existing reusable components FIRST. New UI → small reusable components, not one blob. Logic out of templates into functions. Follow app theme + FSD layering. Minimal HTML/CSS. Good UX: loading/empty/error states, sensible spacing, accessibility.
 - Respect ADRs. Task conflicts ADR → stop, ask user.
 
 ## 4. Verify
 
-- Every **Done When** box except final gate: check, tick in task file. TDD loop already ran per-slice tests during red-green-refactor.
-- Final gate (human-in-loop, see [TASK-FORMAT](../grill-to-tasks/TASK-FORMAT.md#done-when-rules)): agent never runs translation:fix/asset compile/full build/full test suite. List exact commands, stop, wait. OK → tick gate, proceed. Broken → fix, re-list, wait again — loop till confirmed.
+- Every **Done When** box except final gate: check, tick in task file. TDD loop already ran per-slice tests during red-green-refractor.
+- Final gate (human-in-loop): agent never runs translation:fix/asset compile/full build/full test suite. List exact commands, stop, wait. OK → tick gate, proceed.
 
 ## 5. Close task
 
@@ -55,21 +60,17 @@ Code rules (apply during GREEN + refactor):
 
 No `NNNN_*` tasks left in `tasks/draft/` or `tasks/in-progress/` for this NNNN → feature fully done, ready for `/to-review`. Else note remaining count.
 
-## 7. Commit
-
-Stage task file move + all changed code (incl. tests). Commit, caveman-style message:
-
-```
-<type>(<NNNN_SS>): <what, terse, fragments>
-
-<one-line why, caveman>
-```
-
-`type` = feat/fix/refactor/chore matching change. `<NNNN_SS>` = task id. Body line: why, not what — pull from task **Context**. No Co-Authored-By, no extra trailer beyond repo norm.
-
-## 8. Report — caveman, minimal
+## 7. Report — caveman, minimal
 
 - Task id + one line what built. Files touched (paths only). Test count added/passing.
 - Done When: each box pass/fail.
 - Feature: N done / M total tasks for this NNNN.
-- Commit hash + subject line.
+- **Commit Hint:** Provide draft message for user (since user manages commits).
+  ```
+  <type>(<NNNN_SS>): <what, terse, fragments>
+
+  <one-line why, caveman>
+
+  Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+  ```
+  `type` = feat/fix/refractor/chore. `refractor` MUST be used instead of `refactor`.
