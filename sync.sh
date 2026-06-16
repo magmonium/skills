@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 # Sync local skills (~/.claude/skills) and agents (~/.claude/agents) into this repo,
 # bump plugin version, commit, push.
+# Also mirrors skills to ~/.gemini/skills/ so Gemini CLI uses user-level skills
+# (not local .agents/ copies in project repos).
 # Run manually or via launchd watcher (com.magmonium.skills-sync).
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_SKILLS="$HOME/.claude/skills"
 SRC_AGENTS="$HOME/.claude/agents"
+GEMINI_SKILLS="$HOME/.gemini/skills"
 
 # plugin name -> skills it tracks
-WORKFLOW_SKILLS=(grill-to-prd to-tasks to-implement tdd-implement to-review tdd start)
+WORKFLOW_SKILLS=(grill-to-tasks to-implement tdd-implement to-review tdd start)
 MAGMONIUM_SKILLS=(mm-app translate)
 
 # plugin name -> agents it tracks (flat .md files, not subdirs)
@@ -64,6 +67,16 @@ EOF
 sync_plugin workflow-skills "${WORKFLOW_SKILLS[@]}"
 sync_plugin magmonium-skills "${MAGMONIUM_SKILLS[@]}"
 sync_agents magmonium-skills "${MAGMONIUM_AGENTS[@]}"
+
+# Mirror all ~/.claude/skills/ to ~/.gemini/skills/ so Gemini CLI uses user-level
+# skills without needing local .agents/ copies in project repos.
+if [ -d "$GEMINI_SKILLS" ]; then
+  if ! rsync -aL --delete "$SRC_SKILLS/" "$GEMINI_SKILLS/" 2>/dev/null; then
+    echo "warn: gemini skills mirror failed (TCC? run from terminal)"
+  else
+    echo "gemini skills synced → $GEMINI_SKILLS"
+  fi
+fi
 
 cd "$REPO_DIR"
 
