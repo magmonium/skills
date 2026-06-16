@@ -78,6 +78,39 @@ if [ -d "$GEMINI_SKILLS" ]; then
   fi
 fi
 
+# Regenerate launchd plist WatchPaths to cover any newly added skills/agents.
+# Reload only if plist changed — avoids unnecessary launchd churn.
+PLIST="$HOME/Library/LaunchAgents/com.magmonium.skills-sync.plist"
+if [ -f "$PLIST" ]; then
+  watch_entries=""
+  watch_entries+="    <string>$SRC_SKILLS</string>\n"
+  for s in $(ls "$SRC_SKILLS" 2>/dev/null | sort); do
+    watch_entries+="    <string>$SRC_SKILLS/$s</string>\n"
+  done
+  if [ -d "$SRC_AGENTS" ]; then
+    watch_entries+="    <string>$SRC_AGENTS</string>\n"
+    for a in $(ls "$SRC_AGENTS" 2>/dev/null | sort); do
+      watch_entries+="    <string>$SRC_AGENTS/$a</string>\n"
+    done
+  fi
+  new_plist=$(python3 - "$PLIST" "$watch_entries" <<'PYEOF'
+import sys, re
+path, entries = sys.argv[1], sys.argv[2]
+with open(path) as f:
+    content = f.read()
+block = "  <key>WatchPaths</key>\n  <array>\n" + entries + "  </array>"
+new = re.sub(r'  <key>WatchPaths</key>\s*<array>.*?</array>', block, content, flags=re.DOTALL)
+print(new, end="")
+PYEOF
+  )
+  if [ "$new_plist" != "$(cat "$PLIST")" ]; then
+    echo "$new_plist" > "$PLIST"
+    launchctl unload "$PLIST" 2>/dev/null || true
+    launchctl load "$PLIST"
+    echo "launchd plist updated + reloaded"
+  fi
+fi
+
 cd "$REPO_DIR"
 
 bumped=()
