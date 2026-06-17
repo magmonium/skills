@@ -25,9 +25,28 @@ If a question can be answered by exploring the codebase, explore the codebase in
 
 Track resolved decisions as you go — they feed the tasks' **Context** sections and **Done When** boxes. Also track: problem (what hurts), solution (what fixes it), user stories, testing approach, out-of-scope items.
 
+## Phase 1.5 — Decide: tasks or direct?
+
+After grill resolves, assess before writing any files:
+
+**Implement directly** (skip Phase 2) when ALL of:
+- Single concern — fits one agent turn, no parallel frontend+backend split needed
+- No new DB schema, no contract negotiation between FE and BE
+- No meaningful dependency chain (one task would just depend on another)
+- Change is bounded to ≤ ~3 files or a clear isolated layer
+
+→ Tell user "Simple enough — implementing directly." Then implement inline (no task files created).
+
+**Slice into tasks** (continue Phase 2) when ANY of:
+- Parallel frontend + backend work
+- DB schema or API contract to define first
+- Multiple concerns spanning FSD layers or repos
+- Human gate needed (design review, store approval, credentials)
+- Change touches > ~3 files across layers
+
 ## Phase 2 — Slice into tasks
 
-When all branches are resolved (or user says "write the tasks" / "enough"):
+When all branches are resolved (or user says "write the tasks" / "enough") AND direct implementation not applicable:
 
 ### 1. Determine NNNN
 
