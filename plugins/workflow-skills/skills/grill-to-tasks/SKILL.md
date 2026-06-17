@@ -15,6 +15,14 @@ Ask questions one at a time, waiting for an answer before continuing.
 
 If a question can be answered by exploring the codebase, explore the codebase instead of asking.
 
+**Challenge against the domain model** — when the user uses a term that conflicts with existing language in `CONTEXT.md` (or sibling repo contexts), call it out immediately: "Your glossary defines 'X' as Y, but you seem to mean Z — which is it?"
+
+**Sharpen fuzzy language** — when the user uses vague or overloaded terms, propose a precise canonical term: "You're saying 'account' — do you mean the Customer or the User? Those are different things."
+
+**Discuss concrete scenarios** — when domain relationships are being discussed, stress-test with specific scenarios. Invent scenarios that probe edge cases and force precision about the boundaries between concepts.
+
+**Cross-reference with code** — when the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
+
 Track resolved decisions as you go — they feed the tasks' **Context** sections and **Done When** boxes. Also track: problem (what hurts), solution (what fixes it), user stories, testing approach, out-of-scope items.
 
 ## Phase 2 — Slice into tasks
