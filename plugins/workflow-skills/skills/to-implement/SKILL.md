@@ -43,12 +43,12 @@ Rules:
 ## 4. Verify
 
 - Every **Done When** box except final gate: check, tick in task file.
-- **Translation lint errors:** Agent NEVER runs `translation:fix`. If lint fails **only** on translation errors → tell user to run it, stop, wait for user to confirm it's done. Once confirmed → re-run lint, tick remaining boxes, proceed to close + commit hint (step 7).
-- Final gate (human-in-loop): agent never runs translation:fix/asset compile/build/test. List exact commands, stop, wait. OK → tick gate, proceed to close + commit hint.
+- **Translation lint errors:** Agent NEVER runs `translation:fix`. If lint fails **only** on translation errors → tell user to run it, stop, wait for user to confirm it's done. Once confirmed → re-run lint, tick remaining boxes, proceed to close + commit (step 7).
+- Final gate (human-in-loop): agent never runs translation:fix/asset compile/build/test. List exact commands, stop, wait. OK → tick gate, proceed to close + commit.
 
 ## 5. Close task
 
-- `Human:` ≠ none and human step pending (translation fix, asset compile, build, test) → task STAYS in `tasks/in-progress/`, report exact human step. Once user confirms step done → move task → `tasks/done/`, provide commit hint (step 7).
+- `Human:` ≠ none and human step pending (translation fix, asset compile, build, test) → task STAYS in `tasks/in-progress/`, report exact human step. Once user confirms step done → move task → `tasks/done/`, run git commit (step 7).
 - Else move task file → `tasks/done/` (create folder if missing).
 
 ## 6. Feature status
@@ -60,7 +60,7 @@ No `NNNN_*` tasks left in `tasks/draft/` or `tasks/in-progress/` for this NNNN �
 - Task id + one line what built. Files touched (paths only).
 - Done When: each box pass/fail.
 - Feature: N done / M total tasks for this NNNN.
-- **Commit Hint:** Provide draft message for user (since user manages commits).
+- **Commit:** Run `git add` on changed files, then `git commit` with message:
   ```
   <type>(<NNNN_SS>): <what, terse, fragments>
 
