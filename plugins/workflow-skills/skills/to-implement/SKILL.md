@@ -43,11 +43,12 @@ Rules:
 ## 4. Verify
 
 - Every **Done When** box except final gate: check, tick in task file.
-- Final gate (human-in-loop): agent never runs translation:fix/asset compile/build/test. List exact commands, stop, wait. OK → tick gate, proceed.
+- **Translation lint errors:** Agent NEVER runs `translation:fix`. If lint fails **only** on translation errors → tell user to run it, stop, wait for user to confirm it's done. Once confirmed → re-run lint, tick remaining boxes, proceed to close + commit hint (step 7).
+- Final gate (human-in-loop): agent never runs translation:fix/asset compile/build/test. List exact commands, stop, wait. OK → tick gate, proceed to close + commit hint.
 
 ## 5. Close task
 
-- `Human:` ≠ none and human step pending → task STAYS in `tasks/in-progress/`, report exact human step.
+- `Human:` ≠ none and human step pending (translation fix, asset compile, build, test) → task STAYS in `tasks/in-progress/`, report exact human step. Once user confirms step done → move task → `tasks/done/`, provide commit hint (step 7).
 - Else move task file → `tasks/done/` (create folder if missing).
 
 ## 6. Feature status
