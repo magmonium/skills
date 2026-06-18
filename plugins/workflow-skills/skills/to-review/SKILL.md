@@ -1,34 +1,36 @@
 ---
 name: to-review
-description: Pick the highest-NNNN feature whose tasks are fully in tasks/done/, verify each done task against actual code, audit the implemented code for security/architecture/DRY flaws, then create draft gap/refractor tasks continuing that feature's SS sequence. Use when user says "to review", "review done tasks", or wants a finished feature verified against the codebase.
+description: Pick the highest-NNNN feature folder in done state, verify each done issue against actual code, audit implemented code for security/architecture/DRY flaws, then create draft gap/refractor issues continuing that feature's NN sequence. Use when user says "to review", "review done tasks", or wants a finished feature verified against the codebase.
 ---
 
 # To Review
 
-Pick the highest NNNN feature group sitting in `tasks/done/` → tally its tasks against real code → audit code for security/architecture/DRY flaws → gaps become draft tasks, agreed findings become refractor tasks, both continuing that NNNN's SS sequence in `tasks/draft/`.
+Pick highest NNNN done task folder → tally its issues against real code → audit code for security/architecture/DRY flaws → gaps become draft issues, agreed findings become refractor issues, both continuing that NNNN's NN sequence inside the task folder.
 
-Inverse of `/to-implement`: that skill moves work forward, this one checks finished work and reopens the feature with new draft tasks when reality disagrees.
+Inverse of `/to-implement`: that skill moves work forward, this one checks finished work and reopens the feature with new draft issues when reality disagrees.
 
-## 1. Pick feature group
+## 1. Pick feature folder
 
-- Argument (`NNNN` or path) → use that NNNN.
-- No argument → HIGHEST `NNNN_` prefix appearing in `tasks/done/`.
-- `tasks/done/` empty/missing → tell user, stop.
+- Argument (`NNNN` or folder path) → use that NNNN.
+- No argument → HIGHEST `NNNN_` prefix in `tasks/` top-level whose folder matches `NNNN_done_*`.
+- No `NNNN_done_*` folders → tell user, stop.
 
-Collect every `NNNN_*` task file for that NNNN across `tasks/done/`, `tasks/in-progress/`, `tasks/draft/`. Tasks NOT in `tasks/done/` while this NNNN is being reviewed → inconsistent state, report it, count those as gaps.
+Collect every `NN_*` issue file inside that folder. Issues still `NN_draft_*` while folder shows done → inconsistent state, report it, count those as gaps.
 
-## 2. Tally tasks vs code
+## 2. Tally issues vs code
 
-Per done task:
+Per done issue:
 
-- Read **Context** + **What** + **Done When** boxes.
-- Verify in CODE, not in task file ticks. Find the implementation (grep/read modules the task names), confirm each box's observable outcome actually exists. Ticked box ≠ proof.
+- Read **What** + **Acceptance Criteria** boxes.
+- Verify in CODE, not in issue file ticks. Find implementation (grep/read modules the issue names), confirm each box's observable outcome actually exists. Ticked box ≠ proof.
 - Run project test suite for touched area when cheap (use wrapper/commands from project CLAUDE.md).
-- Verdict per task: `complete` | `gap` (+ one line which box fails and why).
+- Verdict per issue: `complete` | `gap` (+ one line which criterion fails and why).
+
+Also read `prd.md` — confirm every user story landed somewhere in an issue.
 
 ## 3. Audit implemented code
 
-Scope: only modules/files this NNNN's tasks touched — not whole repo. Check per [REVIEW-CHECKS.md](./REVIEW-CHECKS.md):
+Scope: only modules/files this NNNN's issues touched — not whole repo. Check per [REVIEW-CHECKS.md](./REVIEW-CHECKS.md):
 
 - **Security** — injection, authz/authn holes, secrets, unsafe input handling.
 - **Architecture** — violates project ADRs/CLAUDE.md conventions (Signals, inject, Assets-first, `refractor`, no-commit), wrong layering, god-blob components.
@@ -36,34 +38,33 @@ Scope: only modules/files this NNNN's tasks touched — not whole repo. Check pe
 
 Verdict per finding: location, problem, fix — one line each.
 
-## 4. Create tasks
+## 4. Create gap/refractor issues
 
 Two kinds, different gates:
 
-- **Gap tasks** (step 2 failures) — create immediately, no asking. One task per gap.
-- **Refractor tasks** (step 3 findings) — present findings to user first. Security findings: write in plain clear prose (auto-clarity, no caveman). User agrees finding → create task. User rejects → drop it.
+- **Gap issues** (step 2 failures) — create immediately, no asking. One issue per gap.
+- **Refractor issues** (step 3 findings) — present findings to user first. Security findings: write in plain clear prose (auto-clarity, no caveman). User agrees → create issue. User rejects → drop it.
 
-Task files follow `grill-to-tasks` format, written to `tasks/draft/`:
+Issue files follow `grill-to-tasks` ISSUE-FORMAT.md, written into the same task folder (`tasks/NNNN_done_<desc>/`):
 
-- Numbering: `NNNN_SS_<type>_<kebab-desc>.md` — NNNN = the feature being reviewed, SS = highest existing SS for that NNNN (any folder) + 1, incrementing per new task.
-- Gap task type: original vocabulary (backend/frontend/integration/…) matching what's missing.
-- Refractor task type: `refractor`. **What** names the flaw + the fix; security refs the exact finding.
-- **Context:** 2–4 lines — what's missing/wrong and why, distilled from the gap or finding. No PRD to point at.
-- **Refs:** ADRs only, when finding leans on one. Omit if none.
-- **Done When:** external behavior only, 2–5 boxes.
+- Numbering: `NN_draft_<kebab-desc>.md` — NN = highest existing NN in that folder (any status) + 1, incrementing per new issue.
+- Gap issue **What**: what's missing + observable criteria to confirm presence.
+- Refractor issue **What**: names flaw + fix. Security **What** cites exact finding in plain prose.
+- **Acceptance Criteria:** external behavior only, 2–5 boxes.
+- **Blocked By:** list any prerequisite issue.
 
 ## 5. Report — caveman, minimal
 
-- NNNN reviewed + verdict: `clean` | `reopened` (reopened = new draft tasks added).
-- Task tally: N complete / M total, one line per gap.
+- NNNN reviewed + verdict: `clean` | `reopened` (reopened = new draft issues added).
+- Issue tally: N complete / M total, one line per gap.
 - Findings: accepted / rejected counts, one line each accepted.
-- New task files (paths only).
+- New issue files (paths only).
 - NO commit — user commits. No prose padding. Security details exempt from caveman.
 - **Commit Hint:** If feature clean, provide draft merge message.
   ```
-  feat(<NNNN>): <feature name> complete
+  feat(NNNN): <feature name> complete
 
-  - all <M> tasks verified in code
+  - all <M> issues verified in code
   - security and architecture audit passed
   - follows Magmonium Signals + refractor patterns
 

@@ -1,28 +1,33 @@
 ---
 name: to-implement
-description: Pick lowest-index ready task from tasks/draft/, move it to tasks/in-progress/, implement it straight following existing codebase patterns, then move it to tasks/done/. Use when user says "to implement", "implement next task", or wants the next drafted task built directly (no TDD).
+description: Pick lowest-index ready task folder from tasks/, pick lowest-index draft issue inside it, implement it straight following existing codebase patterns, then mark issue done. Use when user says "to implement", "implement next task", or wants the next drafted task built directly (no TDD).
 ---
 
 # To Implement
 
-Pick next ready task from `tasks/draft/` → move to `tasks/in-progress/` → implement → `tasks/done/`.
+Pick lowest NNNN draft task folder → pick lowest NN draft issue → implement → mark issue done → mark folder done when all issues done.
 
 Sibling: `/tdd-implement` — same lifecycle, TDD red-green-refactor instead of straight build.
 
-## 1. Pick task
+## 1. Pick task folder + issue
 
-- Argument (task id `NNNN_SS` or path) → use that task, wherever it sits (`tasks/in-progress/` or `tasks/draft/`).
-- No argument → check `tasks/in-progress/` FIRST. Task there → resume it: read task file, see which **Done When** boxes already ticked, diff code vs task to gauge real progress (boxes may lag code — verify), finish remaining work only. Multiple → lowest `NNNN_SS`. Task waiting ONLY on pending human step → report step, skip it, fall through to draft pick.
-- `tasks/in-progress/` empty → lowest `NNNN_SS` in `tasks/draft/` whose **Depends** are ALL in `tasks/done/`.
-- Tasks exist but none eligible → list what blocks each, stop.
-- Both folders empty/missing → tell user, stop.
+**If argument given** (NNNN number or folder path) → use that task folder.
 
-Draft pick → move file `tasks/draft/` → `tasks/in-progress/` (create folder if missing; `git mv` when tracked). Resumed task already there — no move. Then start.
+**No argument:**
+- Scan `tasks/` top-level for folders matching `NNNN_draft_*`. Pick LOWEST NNNN.
+- No draft folders → tell user, stop.
+
+**Inside chosen task folder:**
+- Scan for files matching `NN_draft_*`. Pick LOWEST NN.
+- No draft issues left → all issues done; rename folder `NNNN_draft_<desc>` → `NNNN_done_<desc>` (`git mv`), report feature done, stop.
+- Issue's **Blocked By** names another issue still `_draft_` → report blocker, skip, pick next unblocked. None unblocked → list blockers, stop.
+
+No move to in-progress — no intermediate state. Pick and implement directly.
 
 ## 2. Read context
 
-- Task file fully — **Context** section carries the why (no PRD). Then its **Refs** — ADRs listed, if any.
-- **Depends** tasks in `tasks/done/` — esp. `Mode: reference` ones (modelling contracts).
+- `prd.md` in the task folder — overall feature context.
+- The chosen issue file fully — **What**, **One UI**, **Acceptance Criteria**, **Blocked By**.
 - Explore code around the change: existing patterns, reusable components, theme, API/model conventions, project CLAUDE.md. Match what exists — no new pattern when one already covers it.
 
 ## 3. Implement
@@ -37,32 +42,31 @@ Rules:
 - **Text:** All text via `| translate` pipe — no raw strings in templates.
 - **Styling:** `.sass` only (no `.css`), BEM naming, max 3 nesting levels. Import `@use 'index' as m`.
 - **FSD Layering:** `pages` → `widgets` → `features` → `entities` → `shared`.
-- DRY, efficient, modern idiom for the stack. Smallest diff that satisfies task.
-- Follow per-type rules in task file (mock data for frontend, contract from modelling task, etc.).
+- DRY, efficient, modern idiom for the stack. Smallest diff that satisfies issue.
+- If issue has **One UI** section: follow those constraints exactly.
 
 ## 4. Verify
 
-- Every **Done When** box except final gate: check, tick in task file.
-- **Translation lint errors:** Agent NEVER runs `translation:fix`. If lint fails **only** on translation errors → tell user to run it, stop, wait for user to confirm it's done. Once confirmed → re-run lint, tick remaining boxes, proceed to close + commit (step 7).
-- Final gate (human-in-loop): agent never runs translation:fix/asset compile/build/test. List exact commands, stop, wait. OK → tick gate, proceed to close + commit.
+- Every **Acceptance Criteria** box except final gate: check, tick in issue file.
+- **Translation lint errors:** Agent NEVER runs `translation:fix`. Lint fails only on translation errors → tell user to run it, stop, wait. User confirms done → re-run lint, tick remaining boxes, proceed to close + commit (step 5).
+- Final gate (human build/lint/test): agent never runs translation:fix/asset compile/build/test. List exact commands, stop, wait. OK → tick gate, proceed.
 
-## 5. Close task
+## 5. Mark done
 
-- `Human:` ≠ none and human step pending (translation fix, asset compile, build, test) → task STAYS in `tasks/in-progress/`, report exact human step. Once user confirms step done → move task → `tasks/done/`, run git commit (step 7).
-- Else move task file → `tasks/done/` (create folder if missing).
+- Human gate pending → report exact human step. Wait for user to confirm done, then proceed.
+- Rename issue file: `NN_draft_<desc>.md` → `NN_done_<desc>.md` (`git mv` inside task folder).
+- Check task folder: any `NN_draft_*` files remaining?
+  - Yes → note count remaining, stop.
+  - No → rename task folder: `NNNN_draft_<desc>` → `NNNN_done_<desc>` (`git mv`). Feature done → ready for `/to-review`.
 
-## 6. Feature status
+## 6. Report — caveman, minimal
 
-No `NNNN_*` tasks left in `tasks/draft/` or `tasks/in-progress/` for this NNNN → feature fully done, ready for `/to-review`. Else note remaining count.
-
-## 7. Report — caveman, minimal
-
-- Task id + one line what built. Files touched (paths only).
-- Done When: each box pass/fail.
-- Feature: N done / M total tasks for this NNNN.
+- Issue id (`NNNN/NN`) + one line what built. Files touched (paths only).
+- Acceptance Criteria: each box pass/fail.
+- Feature: N done / M total issues for this NNNN.
 - **Commit:** Run `git add` on changed files, then `git commit` with message:
   ```
-  <type>(<NNNN_SS>): <what, terse, fragments>
+  <type>(NNNN/NN): <what, terse, fragments>
 
   <one-line why, caveman>
 

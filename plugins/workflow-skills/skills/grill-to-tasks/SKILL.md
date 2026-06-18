@@ -1,102 +1,104 @@
 ---
 name: grill-to-tasks
-description: Interview the user relentlessly about a plan or feature until shared understanding, then slice it directly into at most four typed task files (frontend, backend, integration, migration — plus optional one-ui) under tasks/draft/. No PRD step. Numbering NNNN_SS — NNNN = highest existing across tasks/draft, tasks/in-progress, tasks/done, plus one. Use when user wants to grill an idea straight into tasks, says "grill to tasks", or wants to skip the PRD step entirely.
+description: Grill the user via grill-with-docs to align on a plan, then either implement directly (small) or create a task folder with prd.md + issue files (large). Use when user wants to grill an idea straight into tasks, says "grill to tasks", or wants to skip the PRD step entirely.
 ---
 
 # Grill to Tasks
 
-Two phases: grill, then slice straight into task files. No PRD, no issue tracker — output is task files in `tasks/draft/`, each carrying its own context.
+Two phases: grill to align, then assess — direct impl or task folder with PRD + issues.
 
 ## Phase 1 — Grill
 
-Interview the user relentlessly about every aspect of the plan until shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+Invoke `grill-with-docs` skill. Follow it exactly. Grill until shared understanding: domain aligned, terminology sharp, edge cases resolved, decisions captured.
 
-Ask questions one at a time, waiting for an answer before continuing.
-
-If a question can be answered by exploring the codebase, explore the codebase instead of asking.
-
-**Challenge against the domain model** — when the user uses a term that conflicts with existing language in `CONTEXT.md` (or sibling repo contexts), call it out immediately: "Your glossary defines 'X' as Y, but you seem to mean Z — which is it?"
-
-**Sharpen fuzzy language** — when the user uses vague or overloaded terms, propose a precise canonical term: "You're saying 'account' — do you mean the Customer or the User? Those are different things."
-
-**Discuss concrete scenarios** — when domain relationships are being discussed, stress-test with specific scenarios. Invent scenarios that probe edge cases and force precision about the boundaries between concepts.
-
-**Cross-reference with code** — when the user states how something works, check whether the code agrees. If you find a contradiction, surface it: "Your code cancels entire Orders, but you just said partial cancellation is possible — which is right?"
-
-Track resolved decisions as you go — they feed the tasks' **Context** sections and **Done When** boxes. Also track: problem (what hurts), solution (what fixes it), user stories, testing approach, out-of-scope items.
-
-## Phase 1.5 — Decide: tasks or direct?
+## Phase 1.5 — Decide: direct or task folder?
 
 After grill resolves, assess before writing any files:
 
-**Implement directly** (skip Phase 2) when ALL of:
-- Single concern — fits one agent turn, no parallel frontend+backend split needed
-- No new DB schema, no contract negotiation between FE and BE
-- No meaningful dependency chain (one task would just depend on another)
-- Change is bounded to ≤ ~3 files or a clear isolated layer
+**Implement directly** when ALL of:
+- Single concern — fits one agent turn
+- No new DB schema, no API contract negotiation between layers
+- No meaningful dependency chain between pieces
+- Change bounded to ≤ ~3 files or clear isolated layer
 
-→ Tell user "Simple enough — implementing directly." Then implement inline (no task files created).
+→ Tell user "Simple — implementing directly." Then implement inline. No files created.
 
-**Slice into tasks** (continue Phase 2) when ANY of:
-- Parallel frontend + backend work
-- DB schema or API contract to define first
+**Create task folder** when ANY of:
 - Multiple concerns spanning FSD layers or repos
-- Human gate needed (design review, store approval, credentials)
+- DB schema or API contract to define first
+- UI work requiring one-ui components or new screens
 - Change touches > ~3 files across layers
+- Human gate needed (design review, credentials, store approval)
 
-## Phase 2 — Slice into tasks
-
-When all branches are resolved (or user says "write the tasks" / "enough") AND direct implementation not applicable:
+## Phase 2 — Create task folder
 
 ### 1. Determine NNNN
 
-Scan `tasks/draft/`, `tasks/in-progress/`, `tasks/done/` for `NNNN_` prefixes. NNNN = highest found + 1, zero-padded to 4 digits. None found anywhere → `0001`.
+Scan `tasks/` top-level for folders matching `NNNN_draft_*` and `NNNN_done_*`. NNNN = highest found + 1, zero-padded to 4 digits. None found → `0001`.
 
-### 2. Explore codebase
+### 2. Create folder
 
-Find: existing reusable components (One UI library first), theme, API patterns, i18n setup, model conventions. Task descriptions must use real project vocabulary, not invented names.
+Create: `tasks/NNNN_draft_<kebab-desc>/`
 
-### 3. Slice into tasks — MAX FOUR
+`<kebab-desc>` = 2–4 word kebab slug of the feature from grill session. Example: `user-auth-flow`, `deploy-status-screen`.
 
-Fixed task set. Create each ONLY when the feature needs it (pure-backend feature → no frontend/integration task; etc.):
+### 3. Write prd.md
 
-| # | Type | Job |
-|---|------|-----|
-| 1 | `frontend` | Pure FE. Screen/UI with MOCK data — zero API calls. Use One UI components + One UI knowledge to make screen beautiful. SAME task handles assets (icons, images, illustrations) AND translations — body must instruct agent to run `/translate` skill after UI built. Code compiles, lint passes. |
-| 2 | `backend` | API endpoints, business logic, DB changes. Defines contract (request/response shapes) frontend will later bind to. Runs PARALLEL with frontend — frontend mocked, no dependency between them. |
-| 3 | `integration` | Swap frontend mocks for real backend API. Wire end-to-end: loading/error states, real data in, mocks out, feature actually works. Depends on frontend + backend. |
-| 4 | `migration` | Stabilization pass over WHOLE implementation. Hunt deviations: code architecture (FSD layering, module boundaries), DRY violations, security issues; run `/fe-review` skill on FE delta. Fix/migrate what found — code stable + beautiful. OPTIONAL — skip when implementation small/clean. Depends on integration. |
+Write `tasks/NNNN_draft_<kebab-desc>/prd.md` — synthesize from grill session. Use exact domain vocabulary from grill. No invented terms.
 
-One UI reusable-component check — do DURING slicing, before writing files:
+Sections (in order):
 
-- Shaping frontend task → scan the feature's UI for pieces reusable beyond this feature (generic card, picker, status badge…).
-- Candidate found → ASK USER: "X looks reusable — create One UI component task for it?"
-- Yes → add `one-ui` task: build component in One UI library; frontend task depends on it.
-- `one-ui` task is PURELY presentational — UI/UX + aesthetics ONLY. Zero business logic: no API calls, no state management, no domain rules, no feature-specific behavior. Component takes data via inputs, emits events via outputs — consumer (frontend task) owns all logic. Task body must state this constraint.
-- No → frontend task builds it locally inside the app.
+```markdown
+# NNNN — <Feature Title>
 
-Rules:
+## Problem Statement
 
-- Full coverage: every user story / decision from the grill lands in some task. Nothing left unassigned.
-- Each task lists what blocks it. Sequence number = dependency order.
-- Task needing human (design review, credentials, store approval, manual QA) → mark `Human:` with what human must do. Prefer no-human tasks.
-- Every task carries its own **Context** (see TASK-FORMAT.md) — no PRD to refer back to.
+What hurts. From the user's perspective.
 
-UI rules (frontend + one-ui tasks must state them):
+## Solution
 
-- Minimal HTML/CSS — reuse One UI / app components before writing new markup.
-- New UI → small reusable components, not one big blob.
-- Logic out of templates — functions separate, components thin.
-- Follow FSD (Feature-Sliced Design) layering of the app.
+What fixes it. From the user's perspective.
 
-Order: one-ui (if any) → frontend ∥ backend → integration → migration (if any).
+## User Stories
 
-### 4. Write task files
+Numbered list. Each: "As a <actor>, I want <feature>, so that <benefit>."
+Be extensive — cover all aspects of the feature.
 
-Numbering: `NNNN_SS_<type>_<kebab-desc>.md` in `tasks/draft/` — NNNN from step 1, SS = 2-digit sequence in dependency order (01 first). Create folder if missing.
+## Implementation Decisions
 
-Format per task: see [TASK-FORMAT.md](./TASK-FORMAT.md). Prose caveman: drop articles/filler/hedging, fragments OK, technical terms exact.
+Modules to build or modify. Interfaces. API contracts (request/response shapes).
+Schema changes. Architectural decisions. Specific interactions.
+NO file paths. NO code snippets (exception: prototype snippet that encodes a decision
+more precisely than prose — inline it, note it came from grill/prototype).
 
-### 5. Report
+## Testing Decisions
 
-Reply with: NNNN chosen + why (highest found + 1, or 0001), then one line per task — filename, type, mode, human flag, depends. Note migration task skipped + why, when skipped.
+What makes a good test. Which modules get tests. Prior art in codebase.
+
+## Out of Scope
+
+What this PRD explicitly does NOT cover.
+```
+
+### 4. Slice into issues
+
+Break PRD into self-completeable vertical slices. Each issue = thin slice cutting through ALL layers needed (schema + endpoint + UI when part of same thin slice). Each slice demoable or verifiable on its own.
+
+**One UI check** — for any slice touching frontend:
+- Screen/page built → issue must carry a `## One UI` section (see ISSUE-FORMAT.md).
+- Reusable component candidate (useful beyond this feature) → ASK USER: "X looks reusable — build as a One UI library component?" Yes → separate issue `NN_draft_one-ui-<component>.md`, screen issue depends on it. No → build locally inside app in the screen issue.
+- One-ui issue: PURELY presentational — inputs/outputs only, zero business logic, no API calls, no state.
+
+**No FE/BE type split** — one issue per concern. If schema must land before UI can start, separate them with a dependency. If tightly coupled, one issue covers all layers.
+
+Issue ordering: one-ui issues first (if any) → schema/backend → UI/screen → integration (if needed). Sequence number = dependency order.
+
+### 5. Write issue files
+
+One file per issue: `tasks/NNNN_draft_<task-desc>/NN_draft_<kebab-issue-desc>.md`
+
+Format: see [ISSUE-FORMAT.md](./ISSUE-FORMAT.md). Keep files small — agent reads in seconds.
+
+### 6. Report
+
+NNNN chosen + why (highest found + 1, or 0001). Folder path created. One line per issue: filename, one-sentence what, blocked by.
