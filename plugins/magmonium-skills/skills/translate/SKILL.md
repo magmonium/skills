@@ -169,11 +169,11 @@ npm run lint:finance              # or lint / lint:comics / lint:wallet / lint:r
 ```
 Scanned: <N> files
 Raw text wrapped with translate pipe: <R>
-  ✓ apps/m-finance/.../widget.html — "Net Margin" → 'net_margin' | translate
+  ✓ apps/m-finance/.../widget.html — "Net Margin" → 'net-margin' | translate
 Found: <M> translate keys
 Already present: <X>
 Created (en-only): <Y> YAML files
-  ✓ apps/m-finance/mag_assets/i18n/s/strongly_bullish.yml
+  ✓ apps/m-finance/mag_assets/i18n/s/strongly-bullish.yml
 CLI translate:fix: <Z> langs filled across <Y> files
 Rectified manually: <K> entries
 assets:compile: ✓   lint: ✓
