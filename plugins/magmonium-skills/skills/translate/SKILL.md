@@ -116,13 +116,17 @@ Skip if found in any of the above.
 
 ### Step 5 — Create missing YAML files (en only)
 
-For each missing key, write `<scope>/mag_assets/i18n/<first_char>/<key>.yml` with **ONLY the `en:` line. Do NOT add any other language** — the CLI fills them in Step 6.
+For each missing key, derive the dash-case filename (see Scope Rules algorithm), then write `<scope>/mag_assets/i18n/<first_char_of_filename>/<dash-name>.yml` with **ONLY the `en:` line. Do NOT add any other language** — the CLI fills them in Step 6.
 
 **English value**:
 - Key came from raw text (Step 2) → use the original template text verbatim.
-- Key came from existing `| translate` usage → humanize the key: replace `_` with space, title-case each word. Preserve known abbreviations: `PE`, `PB`, `EPS`, `SMA`, `PNL`, `CAGR`, `ETF`. `strongly_bullish` → `Strongly Bullish`, `pe_ratio` → `PE Ratio`, `high_52w` → `52W High`, `sma_50` → `SMA 50`.
+- Key came from existing `| translate` usage → humanize the key: replace `_` with space, split camelCase on capitals, title-case each word. Preserve known abbreviations: `PE`, `PB`, `EPS`, `SMA`, `PNL`, `CAGR`, `ETF`. `strongly_bullish` → `Strongly Bullish`, `pe_ratio` → `PE Ratio`, `high_52w` → `52W High`, `sma_50` → `SMA 50`. Then run the filename derivation algorithm on the humanised text.
 
-Example `apps/m-finance/mag_assets/i18n/n/net_margin.yml`:
+Example — raw text `"Net Margin"` in `apps/m-finance/`:
+- Dash name: `net-margin`
+- File: `apps/m-finance/mag_assets/i18n/n/net-margin.yml`
+- Template: `{{ 'net-margin' | translate }}`
+
 ```yaml
 en: Net Margin
 ```
