@@ -72,8 +72,8 @@ Grep for `| translate` in templates. Handle three patterns:
 
 **Static string:**
 ```
-'key_name' | translate   →  key = key_name
-"key_name" | translate   →  key = key_name
+'net-margin' | translate   →  key = net-margin
+"search-stocks" | translate →  key = search-stocks
 ```
 
 **Conditional:**
@@ -87,9 +87,15 @@ technicalSentiment().label | translate
 ```
 Find the `computed()`/method in the TS and extract all returned string literals:
 ```ts
-return { label: 'strongly_bullish' }  →  key = strongly_bullish
-return { label: 'bullish_support' }   →  key = bullish_support
+return { label: 'strongly-bullish' }  →  key = strongly-bullish
+return { label: 'bullish-support' }   →  key = bullish-support
 ```
+
+**Existing snake_case / camelCase keys with no YAML file** — do NOT create a file using the old key name. Instead:
+1. Humanise the key (replace `_` with space, split camelCase on capital letters, title-case).
+2. Run the filename derivation algorithm on the humanised text.
+3. Create the file under the new dash-case name.
+4. Update the `| translate` reference in the template to the new key.
 
 **Untraceable** (data from API, e.g. `item.label | translate`):
 → Report as `DYNAMIC/UNTRACEABLE`, skip YAML creation.
