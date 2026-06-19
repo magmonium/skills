@@ -25,7 +25,16 @@ Full i18n pipeline for the nx repo:
 | `apps/m-comics/**` | `apps/m-comics/mag_assets/i18n/` | `apps/m-comics/public/assets/i18n/en.json` |
 | `apps/m-ui/**` | `apps/m-ui/mag_assets/i18n/` | `apps/m-ui/public/assets/i18n/en.json` |
 
-YAML path: `<scope_root>/mag_assets/i18n/<first_char_of_key>/<key>.yml`
+YAML path: `<scope_root>/mag_assets/i18n/<first_char_of_filename>/<filename>.yml`
+
+**Filename derivation algorithm** (applies to all new files):
+1. Take the English text value.
+2. Lowercase it.
+3. Replace every run of non-alphanumeric characters with a single `-`.
+4. Strip leading and trailing `-`.
+5. Result is both the filename (without `.yml`) and the translation key used in templates.
+
+If the derived name starts with a digit → place in `mag_assets/i18n/0-9/` subdir.
 
 ## Process
 
