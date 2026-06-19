@@ -183,8 +183,9 @@ Dynamic/untraceable (manual action needed):
 
 ## Important Notes
 
-- YAML filename = the exact translation key (snake_case)
+- YAML filename = dash-case of the English text (see Scope Rules algorithm) — never snake_case, never camelCase
+- The filename IS the translation key used in `| translate` pipes in templates
 - Never overwrite existing YAML files — check before writing
-- Create the `mag_assets/i18n/<char>/` directory if it doesn't exist
+- Create the `mag_assets/i18n/<char>/` directory if it doesn't exist; use `0-9/` for digit-starting names
 - New YAMLs contain ONLY `en:` — never hand-write other languages before the CLI runs; only fill gaps in Step 7
 - Do not stop after creating YAMLs — Steps 6–8 (CLI, rectify, verify, lint) are mandatory before declaring done
