@@ -10,8 +10,8 @@ description: Use when asked to /translate — scans Angular templates for raw (u
 Full i18n pipeline for the nx repo:
 
 1. **Discover** — find (a) `| translate` keys missing from `mag_assets/i18n/`, and (b) raw hardcoded text in templates that has no `| translate` pipe at all.
-2. **Fix templates** — wrap raw text with `| translate` + new snake_case key.
-3. **Create YAML** — for each missing key, write file with **only the `en:` translation. Nothing else.**
+2. **Fix templates** — wrap raw text with `| translate` + new dash-case key derived from the English text.
+3. **Create YAML** — for each missing key, write file named after the English text with **only the `en:` translation. Nothing else.**
 4. **Run CLI** — `npm run translate:fix` machine-translates all remaining languages.
 5. **Rectify** — review CLI output, fix bad/missed translations.
 6. **Verify** — `npm run assets:compile` + lint for touched scope. All green → complete.
