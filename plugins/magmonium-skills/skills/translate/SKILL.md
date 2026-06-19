@@ -52,7 +52,7 @@ Scan templates (inline + `.html`) for user-visible static text NOT passing throu
 
 Skip: `.spec.ts` files, interpolated variables, numbers/punctuation-only, single chars, icon names, `class`/`id`/routerLink/technical attrs.
 
-For each finding, wrap with translate pipe — key = snake_case of the text:
+For each finding, derive the key using the filename derivation algorithm (see Scope Rules), then wrap with translate pipe:
 
 ```html
 <!-- before -->
@@ -60,11 +60,11 @@ For each finding, wrap with translate pipe — key = snake_case of the text:
 <input placeholder="Search stocks" />
 
 <!-- after -->
-<span>{{ 'net_margin' | translate }}</span>
-<input [placeholder]="'search_stocks' | translate" />
+<span>{{ 'net-margin' | translate }}</span>
+<input [placeholder]="'search-stocks' | translate" />
 ```
 
-The original text becomes the `en:` value of the new key (exact text preserved, not re-humanized). Add these keys to the missing-key list.
+The original text becomes the `en:` value verbatim (exact text preserved, not re-humanized). Key = dash-case filename. Add these keys to the missing-key list.
 
 ### Step 3 — Extract existing translate keys
 
