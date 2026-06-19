@@ -102,16 +102,16 @@ return { label: 'bullish-support' }   →  key = bullish-support
 
 ### Step 4 — Check existing keys
 
-For each key (from Steps 2 + 3):
-1. **Check `libs/one` first** (always): `libs/one/mag_assets/i18n/<char>/<key>.yml` — if found, skip creation regardless of scope. The shared lib serves all apps.
+For each key (from Steps 2 + 3), derive the dash-case filename first, then:
+1. **Check `libs/one` first** (always): `libs/one/mag_assets/i18n/<char>/<dash-name>.yml` — if found, skip creation regardless of scope. The shared lib serves all apps.
 2. Look in compiled JSON: `<scope>/public/assets/i18n/en.json` (or `assets/i18n/en.json` for libs/one)
-3. Also check if YAML source already exists: `<scope>/mag_assets/i18n/<char>/<key>.yml`
+3. Also check if YAML source already exists: `<scope>/mag_assets/i18n/<char>/<dash-name>.yml`
 
 Skip if found in any of the above.
 
-**Deduplication rule**: if same filename already exists in ≥2 apps and not in `libs/one`, do NOT create another copy. Instead flag it:
+**Deduplication rule**: if same dash-named file already exists in ≥2 apps and not in `libs/one`, do NOT create another copy. Instead flag it:
 ```
-⚠ DUPLICATE: <key>.yml found in [app-a, app-b] — move the copy with most translations to libs/one/mag_assets/i18n/<char>/<key>.yml and delete app copies.
+⚠ DUPLICATE: <dash-name>.yml found in [app-a, app-b] — move the copy with most translations to libs/one/mag_assets/i18n/<char>/<dash-name>.yml and delete app copies.
 ```
 
 ### Step 5 — Create missing YAML files (en only)
