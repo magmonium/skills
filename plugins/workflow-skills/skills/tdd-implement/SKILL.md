@@ -62,13 +62,18 @@ Code rules (apply during GREEN + refractor):
 - **Translation lint errors:** Agent NEVER runs `translation:fix`. Lint fails only on translation errors → tell user to run it, stop, wait. User confirms done → re-run lint, tick remaining boxes, proceed to close + commit (step 5).
 - Final gate (human build/lint/test): agent never runs translation:fix/asset compile/full build/full test suite. List exact commands, stop, wait. OK → tick gate, proceed.
 
-## 5. Mark done
+## 5. Mark done (or revert)
 
+**On success:**
 - Human gate pending → report exact human step. Wait for user to confirm done, then proceed.
-- Rename issue file: `NN_draft_<desc>.md` → `NN_done_<desc>.md` (`git mv` inside task folder).
-- Check task folder: any `NN_draft_*` files remaining?
-  - Yes → note count remaining, stop.
+- Rename issue file: `NN_inprogress_<desc>.md` → `NN_done_<desc>.md` (`git mv` inside task folder).
+- Check task folder: any `NN_draft_*` or `NN_inprogress_*` files remaining?
+  - Yes → note count remaining, stop. Folder stays `NNNN_draft_*`.
   - No → rename task folder: `NNNN_draft_<desc>` → `NNNN_done_<desc>` (`git mv`). Feature done → ready for `/to-review`.
+
+**On failure / blocked / abandoned:**
+- Rename issue file back: `NN_inprogress_<desc>.md` → `NN_draft_<desc>.md` (`git mv`). Folder unchanged.
+- Report what failed. Stop.
 
 ## 6. Report — caveman, minimal
 
