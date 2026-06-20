@@ -107,6 +107,8 @@ For each key (from Steps 2 + 3), derive the dash-case filename first, then:
 2. Look in compiled JSON: `<scope>/public/assets/i18n/en.json` (or `assets/i18n/en.json` for libs/one)
 3. Also check if YAML source already exists: `<scope>/mag_assets/i18n/<char>/<dash-name>.yml`
 
+**Extra check for label / placeholder / title / aria-label text** — before creating a new YAML, grep all `mag_assets/i18n/` directories (recursively) for a yml file whose `en:` value matches the English text (case-insensitive). If a match is found under a different dash-case key, reuse that key in the template instead of creating a duplicate.
+
 Skip if found in any of the above.
 
 **Deduplication rule**: if same dash-named file already exists in ≥2 apps and not in `libs/one`, do NOT create another copy. Instead flag it:
