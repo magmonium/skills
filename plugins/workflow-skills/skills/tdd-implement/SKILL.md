@@ -5,7 +5,7 @@ description: Pick lowest-index ready task folder from tasks/, pick lowest-index 
 
 # TDD Implement
 
-Pick lowest NNNN draft task folder → pick lowest NN draft issue → implement TDD → mark issue done → mark folder done when all issues done.
+Pick lowest NNNN draft task folder → pick lowest NN draft issue → mark issue in-progress → implement TDD → mark issue done (or revert to draft) → mark folder done when all issues done.
 
 Sibling: `/to-implement` — same lifecycle, straight build instead of TDD.
 
@@ -17,12 +17,16 @@ Sibling: `/to-implement` — same lifecycle, straight build instead of TDD.
 - Scan `tasks/` top-level for folders matching `NNNN_draft_*`. Pick LOWEST NNNN.
 - No draft folders → tell user, stop.
 
-**Inside chosen task folder:**
-- Scan for files matching `NN_draft_*`. Pick LOWEST NN.
-- No draft issues left → all issues done; rename folder `NNNN_draft_<desc>` → `NNNN_done_<desc>` (`git mv`), report feature done, stop.
-- Issue's **Blocked By** names another issue still `_draft_` → report blocker, skip, pick next unblocked. None unblocked → list blockers, stop.
+**Folder stays `NNNN_draft_*` throughout implementation.** Never rename it to in-progress. Other agents must be able to find it by scanning for `NNNN_draft_*`.
 
-No move to in-progress — no intermediate state. Pick and implement directly.
+**Inside chosen task folder:**
+- Scan for files matching `NN_draft_*`. Pick LOWEST NN. Skip any `NN_inprogress_*` files (already claimed by another run).
+- No `NN_draft_*` issues left:
+  - `NN_inprogress_*` files exist → report those are in-flight, stop.
+  - None in-flight either → all issues done; rename folder `NNNN_draft_<desc>` → `NNNN_done_<desc>` (`git mv`), report feature done, stop.
+- Issue's **Blocked By** names another issue still `_draft_` or `_inprogress_` → report blocker, skip, pick next unblocked. None unblocked → list blockers, stop.
+
+**Immediately after picking:** rename issue file `NN_draft_<desc>.md` → `NN_inprogress_<desc>.md` (`git mv`). This marks it claimed. Folder name unchanged.
 
 ## 2. Read context
 
