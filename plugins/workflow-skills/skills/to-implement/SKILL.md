@@ -75,7 +75,7 @@ Rules:
 - Feature: N done / M total issues for this NNNN.
 - **Commit:** Run `git add` on changed files, then `git commit` with message:
   ```
-  <type>(NNNN/NN): <what, terse, fragments>
+  <type>(NNNN/NN)- <what, terse, fragments>
 
   <one-line why, caveman>
 
