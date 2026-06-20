@@ -45,7 +45,10 @@ Two kinds, different gates:
 - **Gap issues** (step 2 failures) — create immediately, no asking. One issue per gap.
 - **Refractor issues** (step 3 findings) — present findings to user first. Security findings: write in plain clear prose (auto-clarity, no caveman). User agrees → create issue. User rejects → drop it.
 
-Issue files follow `grill-to-tasks` ISSUE-FORMAT.md, written into the same task folder (`tasks/NNNN_done_<desc>/`):
+**Folder rename — do this BEFORE writing any new issue files:**
+If any gap issues will be created, OR if the folder already contains `NN_draft_*` files (inconsistent state), rename the task folder from `NNNN_done_<desc>` → `NNNN_draft_<desc>` using `git mv`. All new issue files are then written into the renamed folder.
+
+Issue files follow `grill-to-tasks` ISSUE-FORMAT.md, written into the task folder (now `tasks/NNNN_draft_<desc>/`):
 
 - Numbering: `NN_draft_<kebab-desc>.md` — NN = highest existing NN in that folder (any status) + 1, incrementing per new issue.
 - Gap issue **What**: what's missing + observable criteria to confirm presence.
