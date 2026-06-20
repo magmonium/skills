@@ -185,7 +185,8 @@ Dynamic/untraceable (manual action needed):
 
 ## Important Notes
 
-- YAML filename = dash-case of the English text (see Scope Rules algorithm) — never snake_case, never camelCase
+- YAML filename = dash-case of the English text (see Scope Rules algorithm) — **only `-` separators, never `_` or camelCase**. The `i18n:compile` CLI rejects any file that does not follow dash-case; snake_case files (e.g. `one_ui_nav_dropdown_input.yml`) will fail at compile time.
+- **Keys come ONLY from visible English text** — never from component names, file paths, Angular selectors, CSS class names, element IDs, or UI hierarchy paths. A name like `one-ui-nav-dropdown-input` encodes structure, not meaning. If you cannot identify the actual displayed text, skip the node and report it as untraceable.
 - The filename IS the translation key used in `| translate` pipes in templates
 - Never overwrite existing YAML files — check before writing
 - Create the `mag_assets/i18n/<char>/` directory if it doesn't exist; use `0-9/` for digit-starting names
