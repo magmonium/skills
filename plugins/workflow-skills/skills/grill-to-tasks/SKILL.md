@@ -89,9 +89,21 @@ Break PRD into self-completeable vertical slices. Each issue = thin slice cuttin
 - Reusable component candidate (useful beyond this feature) → ASK USER: "X looks reusable — build as a One UI library component?" Yes → separate issue `NN_draft_one-ui-<component>.md`, screen issue depends on it. No → build locally inside app in the screen issue.
 - One-ui issue: PURELY presentational — inputs/outputs only, zero business logic, no API calls, no state.
 
+**i18n check** — for any slice with user-visible text in Angular templates:
+- If the feature introduces new UI strings, add a dedicated i18n issue: "Run `/translate` on all new/modified templates to wrap raw text and create YAML keys."
+- If existing i18n keys are being renamed, moved, or deleted, include a migration step in that slice's issue: update all `| translate` references and remove or rename the old YAML files so `i18n:compile` stays green.
+
+**Migration check** — before finalising issue list, ask: does this feature require any of the following?
+- **DB schema migration** — include migration file in the schema issue.
+- **Data migration** — existing rows need backfilling → separate migration issue with rollback plan.
+- **i18n key migration** — old keys renamed/deleted → note which templates and YAML files must update together; coordinate with i18n issue above.
+- **API contract migration** — breaking change to an existing endpoint → note backward-compatibility strategy or versioning decision in the affected issue.
+
+If any migration applies, create or annotate the relevant issue explicitly. Do not leave migrations implicit.
+
 **No FE/BE type split** — one issue per concern. If schema must land before UI can start, separate them with a dependency. If tightly coupled, one issue covers all layers.
 
-Issue ordering: one-ui issues first (if any) → schema/backend → UI/screen → integration (if needed). Sequence number = dependency order.
+Issue ordering: one-ui issues first (if any) → schema/migration → backend → UI/screen → i18n → integration (if needed). Sequence number = dependency order.
 
 ### 5. Write issue files
 
