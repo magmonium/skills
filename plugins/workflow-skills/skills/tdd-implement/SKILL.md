@@ -66,7 +66,6 @@ Code rules (apply during GREEN + refractor):
 ## 5. Mark done (or revert)
 
 **On success:**
-- Human gate pending → report exact human step. Wait for user to confirm done, then proceed.
 - Rename issue file: `NN_inprogress_<desc>.md` → `NN_done_<desc>.md` (`git mv` inside task folder).
 - Check task folder: any `NN_draft_*` or `NN_inprogress_*` files remaining?
   - Yes → note count remaining, stop. Folder stays `NNNN_draft_*`.
