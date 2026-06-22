@@ -58,9 +58,10 @@ Code rules (apply during GREEN + refractor):
 
 ## 4. Verify
 
-- Every **Acceptance Criteria** box except final gate: check, tick in issue file. TDD loop already ran per-slice tests during red-green-refractor.
-- **Translation lint errors:** Agent NEVER runs `translation:fix`. Lint fails only on translation errors → tell user to run it, stop, wait. User confirms done → re-run lint, tick remaining boxes, proceed to close + commit (step 5).
-- Final gate (human build/lint/test): agent never runs translation:fix/asset compile/full build/full test suite. List exact commands, stop, wait. OK → tick gate, proceed.
+- Every **Acceptance Criteria** box: check, tick in issue file. TDD loop already ran per-slice tests during red-green-refractor.
+- Run full lint + test suite directly. Fix any failures before proceeding.
+- **Translation lint errors:** Agent NEVER runs `translation:fix`. If lint fails only on translation errors → note it in report, tick gate anyway, proceed to close + commit (step 5). User can run `translation:fix` after.
+- Asset compile: run `npm run assets:compile` if any `mag_assets/*.yml` changed.
 
 ## 5. Mark done (or revert)
 
