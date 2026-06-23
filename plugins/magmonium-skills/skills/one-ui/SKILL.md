@@ -198,6 +198,58 @@ onAction = (button: Button | undefined, id: string): void => {
 - Shows skeleton while loading, inline broken-image SVG on error
 - **Never add a class to `<m-img>` directly** — wrap in a `<div class="...">` instead
 
+### `m-section` / `m-section-header` / `m-col` — Page Layout (required)
+
+**`m-section` is the ONLY permitted way to segregate a page into logical areas.** Never wrap top-level page regions in hand-rolled `<div>` with custom CSS grid. Responsiveness is delivered by `m-col` breakpoint inputs — never write `grid-template-columns` in component SASS for page-level structure.
+
+```html
+<!-- Basic page layout -->
+<m-section>
+  <m-section-header [sticky]="true">
+    <m-header [level]="2">{{ 'portfolio_title' | translate }}</m-header>
+  </m-section-header>
+
+  <!-- Full-width by default (span 12) -->
+  <m-col>
+    <app-summary />
+  </m-col>
+
+  <!-- Responsive split: full on mobile → half/half on md+ -->
+  <m-col [xs]="12" [md]="6">
+    <app-chart />
+  </m-col>
+  <m-col [xs]="12" [md]="6">
+    <app-table />
+  </m-col>
+</m-section>
+
+<!-- Multiple sections per page — each = one logical region -->
+<m-section (inView)="onVisible($event)">
+  <m-col>...</m-col>
+</m-section>
+```
+
+**`m-section`**
+- Body = 12-column CSS grid; direct children must be `m-col`
+- `(inView)` → emits `boolean` via `IntersectionObserver` (use for lazy loading or active-nav tracking)
+- CSS custom property overrides (set on `m-section` host or ancestor):
+
+| Property | Default | Controls |
+|---|---|---|
+| `--section-px` | `1rem` | horizontal padding |
+| `--section-pt` | `1.5rem` | top padding |
+| `--section-pb` | `3rem` | bottom padding |
+| `--section-header-py` | `1rem` | header vertical padding |
+
+**`m-section-header`** (optional slot inside `m-section`)
+- `[sticky]="true"` → `position: sticky; top: 0` + glass backdrop when scrolled past 120 px
+
+**`m-col`**
+- `xs | sm | md | lg | xl | xxl` inputs → `ColSpan` (1–12); default = full 12 columns
+- Adds `border-right` divider between siblings; flips to `border-bottom` on `≤ sm` breakpoint
+
+---
+
 ### `m-card` / `CardComponent`
 ```html
 <m-card variant="dashboard" [fullHeight]="true">
@@ -319,6 +371,14 @@ onAction = (button: Button | undefined, id: string): void => {
 | App-specific, only used in this app | `apps/<app>/mag_assets/<type>/<name>.yml` | `<m-button name="btn" />` |
 
 **Decide location first. Creating the YAML in the wrong place = silent 404 at runtime.**
+
+
+### Reuse-first asset rule
+
+1. **Grep before you create**: Before creating any new field YAML, check `apps/m-one-ui/mag_assets/fields/` for an existing field covering the same concept. Generic concepts (`size`, `label`, `disabled`, `full_width`) → use the existing generic file. Never create `<component>_size.yml` if `size.yml` exists.
+2. **Name sync**: Field YAML `name` = form binding key. Rename the Angular component's `initialFormData` / `formData` / `data['key']` reads together with the YAML rename — they MUST match.
+3. **i18n Option Pool**: Before creating a new `i18n/d/` file for a radio option value, check if a `dev_controls_option_<value>.yml` already exists. Reuse it. Only create a new `option_*` file when no equivalent exists. Never create `<component>_<prop>_<value>.yml` for generic options (e.g., "Default", "Primary").
+4. **Namespace Separation**: Page-band label keys (`dev_controls_type_*`) are separate from field radio option keys (`dev_controls_option_*`) — do not conflate or delete `type_*` keys.
 
 ### YAML structure by type
 
