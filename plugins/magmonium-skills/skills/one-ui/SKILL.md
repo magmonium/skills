@@ -512,6 +512,7 @@ provideUserTabs({
 
 ## Checklist
 
+- [ ] Page/screen layout uses `m-section` + `m-col` — no hand-rolled CSS grid for page structure
 - [ ] All headings use `m-header [level]`
 - [ ] All buttons use `m-button` with `name` or `[config]` — no `<button>`
 - [ ] All text uses `| translate` with a key
