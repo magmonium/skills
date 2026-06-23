@@ -49,6 +49,7 @@ Code rules (apply during GREEN + refractor):
 - **Magmonium Standard:** Use Signals (`signal`, `computed`, `effect`) for state. No `standalone: true`. Use `inject()` for DI. Use `ChangeDetectionStrategy.OnPush`.
 - **Assets First:** Never hardcode UI config (buttons, forms, navs) in TS. Define in `mag_assets/*.yml`. Run `npm run assets:compile`.
 - **UI Components:** No native `<h1>-<h6>`, `<button>`, `<input>`, or `<img>`. Use `m-header`, `m-button`, `m-input`, `m-img`.
+- **Page Layout:** All page/screen area segregation via `m-section` + `m-col` (12-col responsive grid). No hand-rolled CSS grid or `grid-template-columns` for top-level layout. Use `m-section-header` for sticky section titles. `m-col` breakpoint inputs (`xs`/`sm`/`md`/`lg`/`xl`/`xxl`) = the ONLY way to control responsiveness.
 - **Text:** All text via `| translate` pipe — no raw strings in templates.
 - **Styling:** `.sass` only, BEM naming, max 3 nesting levels. Import `@use 'index' as m`.
 - **FSD Layering:** `pages` → `widgets` → `features` → `entities` → `shared`.
