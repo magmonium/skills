@@ -86,6 +86,7 @@ Break PRD into self-completeable vertical slices. Each issue = thin slice cuttin
 
 **One UI check** — for any slice touching frontend:
 - Screen/page built → issue must carry a `## One UI` section (see ISSUE-FORMAT.md).
+- **Section layout** — every new screen/page MUST use `m-section` for each logical page region and `m-col` for responsive column layout. Responsiveness comes from `m-col` breakpoint inputs (`xs`/`sm`/`md`/`lg`/`xl`/`xxl`), not hand-rolled CSS grid. Mention this explicitly in every issue that builds a screen. No `grid-template-columns` in component SASS for page-level structure.
 - Reusable component candidate (useful beyond this feature) → ASK USER: "X looks reusable — build as a One UI library component?" Yes → separate issue `NN_draft_one-ui-<component>.md`, screen issue depends on it. No → build locally inside app in the screen issue.
 - One-ui issue: PURELY presentational — inputs/outputs only, zero business logic, no API calls, no state.
 
