@@ -112,6 +112,11 @@ One file per issue: `tasks/NNNN_draft_<task-desc>/NN_draft_<kebab-issue-desc>.md
 
 Format: see [ISSUE-FORMAT.md](./ISSUE-FORMAT.md). Keep files small — agent reads in seconds.
 
+**Token efficiency** — write prd.md and all issue files compressed from the start. Apply caveman-full rules inline while writing:
+- Drop articles (a/an/the), filler (just/really/basically), pleasantries, hedging
+- Fragments OK. Short synonyms (use not utilize, fix not implement a solution for)
+- Never create verbose then run `/compress` afterward — that creates `.original.md` backups and wastes two steps
+
 ### 6. Report
 
 NNNN chosen + why (highest found + 1, or 0001). Folder path created. One line per issue: filename, one-sentence what, blocked by.
