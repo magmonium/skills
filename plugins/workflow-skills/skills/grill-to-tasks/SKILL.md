@@ -104,8 +104,10 @@ One file per issue: `tasks/NNNN_draft_<task-desc>/NN_draft_<kebab-issue-desc>.md
 
 Format: see [ISSUE-FORMAT.md](./ISSUE-FORMAT.md).
 
-Apply caveman-full compression to plan.md and all issue files while writing:
+**WRITE CAVEMAN DIRECTLY.** All files (plan.md + every issue) must be caveman-full from first keystroke.
 - Drop articles, filler, pleasantries, hedging. Fragments OK. Short synonyms.
+- Do NOT write verbose prose then compress — compress creates `.original.md` duplicates that clutter folder.
+- Do NOT invoke `/compress` or `caveman:compress` after writing.
 
 ### 6. Report
 
