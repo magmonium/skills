@@ -1,12 +1,12 @@
 ---
 name: grill-to-tasks
-description: Grill the user via grill-with-docs to align on a plan, then either implement directly (small) or create a task folder with plan.md + issue files (large). Use when user wants to grill an idea straight into tasks, says "grill to tasks", or wants to skip the PRD step entirely.
+description: Grill the user via grill-with-docs to align on a plan, then either implement directly (small) or create a task folder with plan.md + task files (large). Use when user wants to grill an idea straight into tasks, says "grill to tasks", or wants to skip the PRD step entirely.
 disable-model-invocation: true
 ---
 
 # Grill to Tasks
 
-Two phases: grill to align, then assess — direct impl or task folder with plan + issues.
+Two phases: grill to align, then assess — direct impl or task folder with plan + tasks.
 
 ## Phase 1 — Grill
 
