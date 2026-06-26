@@ -74,41 +74,39 @@ What makes a good test. Which modules get tests. Prior art in codebase.
 What this plan explicitly does NOT cover.
 ```
 
-### 4. Slice into issues
+### 4. Slice into tasks
 
-Each issue = thin slice through ALL layers needed (schema + endpoint + UI when part of same concern). Each slice demoable or verifiable on its own. No open questions — make all decisions now.
+Each task = one type (frontend | backend | integration | migration | one-ui) per slice. No open questions — make all decisions now. Format: see [TASK-FORMAT.md](./TASK-FORMAT.md).
 
 **One UI** — for any slice touching frontend:
-- Screen/page built → issue carries `## One UI` section (see ISSUE-FORMAT.md).
+- Screen/page built → task type `frontend`, carries One UI section.
 - Every screen MUST use `m-section` per logical region + `m-col` for responsive layout. No `grid-template-columns` in SASS for page-level structure.
-- Component reusable across ≥2 features → separate `NN_draft_one-ui-<component>.md` issue, screen depends on it. Otherwise build locally. Decide now — no asking.
-- One-ui issue: PURELY presentational — inputs/outputs only, zero business logic, no API calls, no state.
+- Component reusable across ≥2 features → separate `NNNN_SS_one-ui_<component>.md` task, screen task depends on it. Otherwise build locally. Decide now — no asking.
+- One-ui task: PURELY presentational — inputs/outputs only, zero business logic, no API calls, no state.
 
 **i18n** — for any slice with user-visible text in Angular templates:
-- New UI strings → dedicated i18n issue: run `/translate` on all new/modified templates.
-- Keys renamed/deleted → migration step in that slice's issue: update all `| translate` refs + YAML files so `i18n:compile` stays green.
+- New UI strings → dedicated i18n task: run `/translate` on all new/modified templates.
+- Keys renamed/deleted → migration step in that slice's task: update all `| translate` refs + YAML files so `i18n:compile` stays green.
 
 **Migrations** — check before finalising:
-- DB schema migration → include migration file in schema issue.
-- Data migration → backfill required → separate issue with rollback plan.
-- i18n key migration → coordinate with i18n issue.
-- API contract breaking change → note versioning strategy in affected issue.
+- DB schema migration → include migration file in schema task.
+- Data migration → backfill required → separate migration task with rollback plan.
+- i18n key migration → coordinate with i18n task.
+- API contract breaking change → note versioning strategy in affected task.
 
-**No FE/BE type split** — one issue per concern. Schema before UI when coupled: dependency, not separate issue.
+Task ordering: one-ui first (if any) → schema/migration → backend → frontend → i18n → integration. Sequence number (SS) = dependency order. Same SS = parallel.
 
-Issue ordering: one-ui first (if any) → schema/migration → backend → UI/screen → i18n → integration. Sequence number = dependency order.
+### 5. Write task files
 
-### 5. Write issue files
+One file per task: `tasks/NNNN_draft_<task-desc>/NNNN_SS_<type>_<kebab-desc>.md`
 
-One file per issue: `tasks/NNNN_draft_<task-desc>/NN_draft_<kebab-issue-desc>.md`
+Format: see [TASK-FORMAT.md](./TASK-FORMAT.md).
 
-Format: see [ISSUE-FORMAT.md](./ISSUE-FORMAT.md).
-
-**WRITE CAVEMAN DIRECTLY.** All files (plan.md + every issue) must be caveman-full from first keystroke.
+**WRITE CAVEMAN DIRECTLY.** All files (plan.md + every task) must be caveman-full from first keystroke.
 - Drop articles, filler, pleasantries, hedging. Fragments OK. Short synonyms.
 - Do NOT write verbose prose then compress — compress creates `.original.md` duplicates that clutter folder.
 - Do NOT invoke `/compress` or `caveman:compress` after writing.
 
 ### 6. Report
 
-NNNN + folder path. One line per issue: filename, one-sentence what, blocked by.
+NNNN + folder path. One line per task: filename, one-sentence what, blocked by.
