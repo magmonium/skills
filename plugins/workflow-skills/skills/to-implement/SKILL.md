@@ -1,23 +1,25 @@
 ---
 name: to-implement
-description: Pick the latest plan file from tasks/ (or a given NNNN), pick its first unblocked unchecked task, implement it straight following existing codebase patterns, then check it off. Use when user says "to implement", "implement next task", or wants the next undone task built directly (no TDD).
+description: Pick the latest plan file from tasks/ (or a given NNNN or NNNN_SS task), pick its first unblocked unchecked task (or the given one), implement it straight following existing codebase patterns, then check it off. Use when user says "to implement", "implement next task", "implement NNNN_SS", or wants the next undone task built directly (no TDD).
 ---
 
 # To Implement
 
-Pick plan file → pick first unblocked `[ ]` task in dependency order → implement → tick its Done-When boxes and its own checkbox.
+Pick plan file → pick task (given task id, or first unblocked `[ ]` in dependency order) → implement → tick its Done-When boxes and its own checkbox.
 
 Sibling: `/tdd-implement` — same lifecycle, TDD red-green-refactor instead of straight build.
 
 ## 1. Pick plan + task
 
-**If argument given** (NNNN number or file path) → use that plan file.
+**Argument given:**
+- `NNNN_SS` (task id) → use plan `NNNN`, target that exact task. Already `[x]` → tell user, stop. **Depends** unmet → report blocker, stop.
+- `NNNN` (plan number) or file path → use that plan file, then auto-pick per below.
 
-**No argument:**
+**No argument** → auto-pick:
 - Scan `tasks/` top-level for files matching `NNNN_*_plan.md`. Pick HIGHEST NNNN (latest).
 - No plan files → tell user, stop.
 
-**Inside the chosen plan's `## Tasks` section**, walk top to bottom (file order = dependency order):
+**Auto-pick inside the chosen plan's `## Tasks` section** (walk top to bottom — file order = dependency order):
 - Pick the first task whose heading checkbox is `[ ]` AND every task named in its **Depends** is `[x]`.
 - No `[ ]` task found → plan fully done, tell user, ready for `/to-review`, stop.
 - First `[ ]` task's **Depends** unmet → skip it, try the next `[ ]` task. None unblocked → list blockers, stop.
