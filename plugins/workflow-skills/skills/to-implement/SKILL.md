@@ -1,36 +1,35 @@
 ---
 name: to-implement
-description: Pick the latest plan file from tasks/ (or a given NNNN or NNNN_SS task), pick its first unblocked unchecked task (or the given one), implement it straight following existing codebase patterns, then check it off. Use when user says "to implement", "implement next task", "implement NNNN_SS", or wants the next undone task built directly (no TDD).
+description: Pick the latest plan file from tasks/ (or a given NNNN plan or NNNN_SS task), then loop every unblocked task top to bottom — implementing each straight, following existing codebase patterns — ticking it off and committing. Same-SS tasks run in parallel via subagents. AFK tasks (Human: none) verify and continue unattended; HIL tasks stop and ask. Plan fully done → git push. Use when user says "to implement", "implement next task", "implement NNNN_SS", "run tasks AFK", or wants the plan built end to end.
 ---
 
 # To Implement
 
-Pick plan file → pick task (given task id, or first unblocked `[ ]` in dependency order) → implement → tick its Done-When boxes and its own checkbox.
+Pick plan file → loop every unblocked task in dependency order (same-SS tasks run in parallel) → implement → tick Done-When boxes + heading checkbox → commit. AFK task (`Human: none`) continues straight to the next task, no stop. HIL task (`Human: <step>`) stops, asks, waits, then resumes. Plan fully done → git push.
 
 Sibling: `/tdd-implement` — same lifecycle, TDD red-green-refactor instead of straight build.
 
-## 1. Pick plan + task
+## 1. Pick plan + mode
 
-**Argument given:**
-- `NNNN_SS` (task id) → use plan `NNNN`, target that exact task. Already `[x]` → tell user, stop. **Depends** unmet → report blocker, stop.
-- `NNNN` (plan number) or file path → use that plan file, then auto-pick per below.
+**Argument = task id (`NNNN_SS`)** → single-task mode. Use plan `NNNN`, target that exact task only. Already `[x]` → tell user, stop. **Depends** unmet → report blocker, stop. Run steps 3a–5 once for this task, then stop — no loop, no push.
 
-**No argument** → auto-pick:
-- Scan `tasks/` top-level for files matching `NNNN_*_plan.md`. Pick HIGHEST NNNN (latest).
-- No plan files → tell user, stop.
+**Argument = plan number/path, or no argument** → loop mode.
+- Given plan number/path → use it. No argument → scan `tasks/` top-level for `NNNN_*_plan.md`, pick HIGHEST NNNN (latest). None found → tell user, stop.
+- Go to step 2.
 
-**Auto-pick inside the chosen plan's `## Tasks` section** (walk top to bottom — file order = dependency order):
-- Pick the first task whose heading checkbox is `[ ]` AND every task named in its **Depends** is `[x]`.
-- No `[ ]` task found → plan fully done, tell user, ready for `/to-review`, stop.
-- First `[ ]` task's **Depends** unmet → skip it, try the next `[ ]` task. None unblocked → list blockers, stop.
+## 2. Loop — pick next task(s)
 
-## 2. Read context
+Walk the plan's `## Tasks` section top to bottom (file order = dependency order):
 
-- Plan header — **Problem**, **Architecture Decisions**, **Testing**, **Out of Scope** — overall feature context.
-- The chosen task block fully — **Context**, **What**, **Done When**.
-- Explore code around the change: existing patterns, reusable components, theme, API/model conventions, project CLAUDE.md. Match what exists — no new pattern when one already covers it.
+- Find task(s) whose heading is `[ ]` AND every id in **Depends** is `[x]`.
+- Two or more of those share the same SS and note each other `parallel: NNNN_SS`? → **parallel group** → step 3b.
+- Otherwise → single next task → step 3a.
+- No `[ ]` task found → plan fully done → step 6 (push).
+- Remaining `[ ]` tasks all blocked (Depends unmet) → list blockers, stop. No push.
 
-## 3. Implement
+## 3a. Implement — single task
+
+Read context: plan header (**Problem**, **Architecture Decisions**, **Testing**, **Out of Scope**) + this task's full block (**Context**, **What**, **Done When**). Explore code around the change: existing patterns, reusable components, theme, API/model conventions, project CLAUDE.md. Match what exists — no new pattern when one already covers it.
 
 Straight build. No test-first ceremony — add tests only where project convention expects them.
 
@@ -46,28 +45,29 @@ Rules:
 - DRY, efficient, modern idiom for the stack. Smallest diff that satisfies the task.
 - If task has **One UI** content in What: follow those constraints exactly.
 
+Go to step 4.
+
+## 3b. Implement — parallel group
+
+For each task in the group: dispatch one `Agent` (subagent_type = `angular-fsd-expert` for frontend/one-ui tasks, `general-purpose` otherwise). Dispatch ALL of them in a single message — true parallel — `run_in_background: false`, wait for all to return before continuing.
+
+Each subagent's prompt carries: plan header context, the task's full block (**Context**/**What**/**Done When**), the Rules list from step 3a, and an explicit instruction to implement code only — **no git commands, no editing the plan file, no commit**. Subagent reports back files touched + which Done-When boxes it believes pass.
+
+Once all subagents return: verify + tick + commit each task in the group **sequentially**, in the order it appears in the plan (avoids concurrent git operations on the same repo). Run step 4 once per task.
+
 ## 4. Verify
 
-- Every **Done When** box except the final gate: check, tick in the plan file.
-- **Translation lint errors:** Agent NEVER runs `translation:fix`. Lint fails only on translation errors → tell user to run it, stop, wait. User confirms done → re-run lint, tick remaining boxes, proceed to close + commit (step 5).
-- Final gate (human build/lint/test): agent never runs translation:fix/asset compile/build/test. List exact commands, stop, wait. OK → tick the gate box, proceed.
+Run the task's Done-When gate commands (build/lint/test — from CLAUDE.md/package.json/repo scripts, never invented) **yourself**. Fix failures, re-run, until they pass.
 
-## 5. Mark done (or leave open)
+- **Translation lint errors — sole exception:** agent NEVER runs `translate`/`translation:fix` (API-key/cost gated). Failure isolated to translation lint → tell user to run it, stop the loop, wait. User confirms done → re-run lint, tick remaining boxes, continue.
+- All other build/lint/test/asset-compile failures: agent fixes and re-verifies itself. Can't converge after reasonable attempts → leave heading `[ ]`, report what failed, stop the loop entirely. No push.
+- Task's **Human** field is not `none` (HIL task): finish every other box, then stop for the named human step — state exactly what's needed, wait. User confirms → tick gate + heading, go to step 5. User says broken → fix, re-ask, wait again.
+- Task's **Human** field is `none` (AFK task): agent completes verification itself, ticks every box including the gate — no stop.
 
-**On success:**
-- Human gate pending → report exact human step. Wait for user to confirm done, then proceed.
-- Tick the task's own `[ ]` → `[x]` heading checkbox.
-- Any `[ ]` task remain in the plan? Yes → note how many remain, stop. No → tell user the plan is fully done, ready for `/to-review`.
+## 5. Tick + commit
 
-**On failure / blocked / abandoned:**
-- Leave the task's heading checkbox `[ ]`. Report what failed. Stop.
-
-## 6. Report — caveman, minimal
-
-- Task id (`NNNN_SS`) + one line what built. Files touched (paths only).
-- Done When: each box pass/fail.
-- Plan: N done / M total tasks for this NNNN.
-- **Commit:** Run `git add` on changed files, then `git commit` with message:
+- Tick every passed **Done When** box, then the task's own `[ ]` → `[x]` heading checkbox.
+- `git add` the changed files, `git commit`:
   ```
   <type>(NNNN/SS)- <what, terse, fragments>
 
@@ -76,3 +76,14 @@ Rules:
   Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
   ```
   `type` = feat/fix/refractor/chore. `refractor` MUST be used instead of `refactor`.
+- **Loop mode:** go back to step 2 for the next task(s) — no stop, no report, just continue (AFK task) unless step 4 raised a HIL/failure stop. **Single-task mode:** go to step 7, stop.
+
+## 6. Push
+
+Loop mode only, plan fully done (every task `[x]`): `git push` (add `-u origin <branch>` if no upstream tracking). Push fails (no remote, diverged, rejected) → report the error, stop — commits stay local, user resolves manually.
+
+## 7. Report — caveman, minimal
+
+- Loop mode: one line per task completed (id + what built + files touched). Final line: N/M tasks done, pushed Y/N.
+- Single-task mode: task id + what built, files touched, Done When pass/fail, N/M tasks done in plan.
+- Any stop mid-loop (HIL wait, translation-only failure, unresolved failure, blocked): what's pending, exact next step, tasks completed so far this run.

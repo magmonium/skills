@@ -60,7 +60,7 @@ follows.
 
 - **Task checkbox** (`[ ]` on the `###` heading) — the task's own status. Ticked only when every Done-When box (incl. human gate) is ticked. This is what `/to-implement`, `/tdd-implement`, `/to-review` scan to find work.
 - **Mode: reference** — task output consumed by other tasks. Says so in What.
-- **Human:** name the exact human step (approve design, provide API key, manual QA on device). `none` when agent finishes alone.
+- **Human:** `none` = AFK task — agent implements, verifies (build/lint/test), ticks, commits, moves to next task unattended. Anything else = HIL task — name the exact human step (approve design, provide API key, manual QA on device); `/to-implement`/`/tdd-implement` loop stops here, asks, waits for confirm before continuing.
 - **Depends:** task IDs only (`NNNN_SS`). Blocked task starts after blockers' checkboxes are ticked. Frontend ∥ backend — no dependency between them. Parallel tasks (same SS) note each other: `parallel: NNNN_SS`.
 - **Refs:** ADRs only, when task leans on one. Omit the line entirely if no ADR applies.
 - **Context:** carries what a PRD would have — problem/solution/decisions for this slice. Written fresh per task from the grill session, not copy-pasted verbatim across tasks.
