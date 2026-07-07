@@ -2,7 +2,8 @@
 # Sync local skills (~/.claude/skills) and agents (~/.claude/agents) into this repo,
 # bump plugin version, commit, push.
 # Also mirrors skills to ~/.gemini/skills/ so Gemini CLI uses user-level skills
-# (not local .agents/ copies in project repos).
+# (not local .agents/ copies in project repos), and to
+# ~/.gemini/antigravity-ide/skills/ so Antigravity IDE stays current too.
 # Run manually or via launchd watcher (com.magmonium.skills-sync).
 set -euo pipefail
 
@@ -10,6 +11,7 @@ REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_SKILLS="$HOME/.claude/skills"
 SRC_AGENTS="$HOME/.claude/agents"
 GEMINI_SKILLS="$HOME/.gemini/skills"
+ANTIGRAVITY_SKILLS="$HOME/.gemini/antigravity-ide/skills"
 
 # plugin name -> skills it tracks
 WORKFLOW_SKILLS=(grill-to-tasks to-implement tdd-implement to-review tdd start)
@@ -75,6 +77,16 @@ if [ -d "$GEMINI_SKILLS" ]; then
     echo "warn: gemini skills mirror failed (TCC? run from terminal)"
   else
     echo "gemini skills synced → $GEMINI_SKILLS"
+  fi
+fi
+
+# Mirror all ~/.claude/skills/ to ~/.gemini/antigravity-ide/skills/ so
+# Antigravity IDE's picker stays current with the same source.
+if [ -d "$ANTIGRAVITY_SKILLS" ]; then
+  if ! rsync -aL --delete "$SRC_SKILLS/" "$ANTIGRAVITY_SKILLS/" 2>/dev/null; then
+    echo "warn: antigravity skills mirror failed (TCC? run from terminal)"
+  else
+    echo "antigravity skills synced → $ANTIGRAVITY_SKILLS"
   fi
 fi
 
