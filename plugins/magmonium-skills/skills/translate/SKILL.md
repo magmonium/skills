@@ -1,6 +1,7 @@
 ---
 name: translate
 description: Use when asked to /translate — scans Angular templates for raw (untranslated) text and | translate pipe usages with missing i18n keys, wraps raw text with the translate pipe, creates en-only YAML files in the correct mag_assets/i18n/ folder, runs the fix-i18n CLI to machine-translate remaining languages, then verifies nothing breaks and lint passes.
+disable-model-invocation: true
 ---
 
 # translate

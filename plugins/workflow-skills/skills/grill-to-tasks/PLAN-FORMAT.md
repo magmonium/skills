@@ -1,47 +1,70 @@
-# Task Format
+# Plan Format
 
-File: `tasks/draft/NNNN_SS_<type>_<kebab-desc>.md`
+File: `tasks/NNNN_<kebab-desc>_plan.md` — one flat file per feature. No folder, no separate task files.
 
-- `NNNN` — feature index, 4 digits (shared by all tasks of this feature).
-- `SS` — sequence, 2 digits, dependency order (01 first).
-- `<type>` — frontend | backend | integration | migration | one-ui.
-- `<kebab-desc>` — short kebab-case task name.
+- `NNNN` — feature index, 4 digits.
+- `<kebab-desc>` — short kebab-case feature name.
 
-Example: `0007_01_backend_deploy-status-api.md`, `0007_01_frontend_deploy-status-screen.md` (same SS = parallel), `0007_02_integration_deploy-status-wire.md`
+All prose caveman. Keep file SMALL — agent reads the whole thing in seconds.
 
-All prose caveman. Section order fixed — agents rely on it. Keep whole file SMALL — agent reads in seconds.
+## File structure
 
 ````md
-# NNNN_SS — <Title>
+# NNNN — <Feature Title>
 
-- **Type:** frontend
+## Problem
+
+What hurts. One precise paragraph.
+
+## Architecture Decisions
+
+Modules touched or created. Interfaces defined (inputs/outputs/contracts).
+Seams introduced. Schema changes. API shapes. No file paths. No code snippets
+(exception: prototype snippet encoding a decision more precisely than prose).
+
+## Testing
+
+What makes a good test. Which modules get tests. Prior art in codebase.
+
+## Out of Scope
+
+What this plan explicitly does NOT cover.
+
+## Tasks
+
+### [ ] NNNN_SS — <Task Title>
+
+- **Type:** frontend | backend | integration | migration | one-ui
 - **Mode:** implement | reference
 - **Human:** none | <what human must do>
 - **Depends:** none | NNNN_SS, NNNN_SS
 - **Refs:** docs/adr/XXXX (if any) — omit line if none
 
-## Context
+**Context:** 2–4 lines, caveman. What hurts + what fixes it, distilled from the grill —
+just the slice relevant to THIS task. No PRD to point at; this is the only context the
+agent gets.
 
-2–4 lines, caveman. What hurts + what fixes it, distilled from the grill — just the slice relevant to THIS task. No PRD to point at; this is the only context the agent gets.
+**What:** 2–5 lines. What to build, where it lives, which contract/reference task it
+follows.
 
-## What
-
-2–5 lines. What to build, where it lives, which contract/reference task it follows.
-
-## Done When
-
+**Done When:**
 - [ ] Observable outcome 1
 - [ ] Observable outcome 2
 - [ ] User runs translation:fix / asset compile / build / test, confirms pass
+
+### [ ] NNNN_SS — <next task>
+...
 ````
 
 ## Field rules
 
+- **Task checkbox** (`[ ]` on the `###` heading) — the task's own status. Ticked only when every Done-When box (incl. human gate) is ticked. This is what `/to-implement`, `/tdd-implement`, `/to-review` scan to find work.
 - **Mode: reference** — task output consumed by other tasks. Says so in What.
 - **Human:** name the exact human step (approve design, provide API key, manual QA on device). `none` when agent finishes alone.
-- **Depends:** task IDs only (`NNNN_SS`). Blocked task starts after blockers done. Frontend ∥ backend — no dependency between them.
-- **Refs:** ADRs only, when task leans on one. No PRD — omit the line entirely if no ADR applies.
+- **Depends:** task IDs only (`NNNN_SS`). Blocked task starts after blockers' checkboxes are ticked. Frontend ∥ backend — no dependency between them. Parallel tasks (same SS) note each other: `parallel: NNNN_SS`.
+- **Refs:** ADRs only, when task leans on one. Omit the line entirely if no ADR applies.
 - **Context:** carries what a PRD would have — problem/solution/decisions for this slice. Written fresh per task from the grill session, not copy-pasted verbatim across tasks.
+- **Task order = dependency order.** Top to bottom in `## Tasks` is the build order. No SS-derived sorting needed elsewhere — position in the file IS the order. `/to-review` appends new tasks at the bottom, continuing the SS sequence.
 
 ## Per-type What must include
 
@@ -57,4 +80,4 @@ All prose caveman. Section order fixed — agents rely on it. Keep whole file SM
 - Each box checkable by agent or named human.
 - 2–5 boxes. More → task too big, split it.
 - Last box ALWAYS the human gate (see exact wording above). Agent NEVER runs translation:fix, asset compile, build, or test itself. Skip only when `Mode: reference` produces no code. Gate box doesn't count toward 2–5.
-- Human-in-loop gate: agent finishes other boxes → lists exact commands (from CLAUDE.md/package.json/repo scripts, never invented) → stops, waits. User OK → tick gate, commit. User says broken → fix, re-list, wait again. Loop till confirmed.
+- Human-in-loop gate: agent finishes other boxes → ticks them → lists exact commands (from CLAUDE.md/package.json/repo scripts, never invented) → stops, waits. User OK → tick gate box AND the task's own heading checkbox, commit. User says broken → fix, re-list, wait again. Loop till confirmed.

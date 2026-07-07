@@ -1,6 +1,7 @@
 ---
 name: start
 description: Bootstrap docs-driven project scaffolding on a new or empty project. Asks for frontend/backend folder paths, inspects their stacks, then writes a minimal CLAUDE.md (structure, commands, FE-BE relationship) and creates docs/prd, docs/adr, docs/tasks folders with an initial 000_architecture.md ADR. Use when user runs /start or asks to initialize project documentation structure.
+disable-model-invocation: true
 ---
 
 # Start — Project Docs Bootstrap
